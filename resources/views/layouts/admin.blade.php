@@ -12,8 +12,6 @@
         .nav-item.active { background: rgba(255,255,255,0.2); border-left: 3px solid #F59E0B; }
         @keyframes slideIn { from { transform: translateX(-10px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .animate-slide { animation: slideIn 0.3s ease; }
-        .dropdown-menu { display: none; }
-        .dropdown:hover .dropdown-menu { display: block; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -64,6 +62,9 @@
                 <i class="fas fa-truck w-5"></i><span>Purchase Orders</span>
             </a>
             <div class="pt-2 pb-1"><p class="text-orange-300 text-xs font-semibold uppercase tracking-wider px-3">Products</p></div>
+            <a href="{{ route('admin.product-categories.index') }}" class="nav-item flex items-center space-x-3 p-3 rounded-lg text-sm {{ request()->routeIs('admin.product-categories*') ? 'active' : '' }}">
+                <i class="fas fa-tags w-5"></i><span>Categories</span>
+            </a>
             <a href="{{ route('admin.products.index') }}" class="nav-item flex items-center space-x-3 p-3 rounded-lg text-sm {{ request()->routeIs('admin.products*') ? 'active' : '' }}">
                 <i class="fas fa-solar-panel w-5"></i><span>Products</span>
             </a>
@@ -93,7 +94,7 @@
                 @php $unreadCount = \App\Models\Notification::where('is_read',false)->count(); @endphp
                 @if($unreadCount > 0)<span class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5">{{ $unreadCount }}</span>@endif
             </a>
-            <a href="{{ route('admin.roles.index') }}" class="nav-item flex items-center space-x-3 p-3 rounded-lg text-sm {{ request()->routeIs('admin.roles*') ? 'active' : '' }}">
+            <a href="{{ route('admin.roles.index') }}" class="nav-item flex items-center space-x-3 p-3 rounded-lg text-sm {{ request()->routeIs('admin.roles*') || request()->routeIs('admin.users*') ? 'active' : '' }}">
                 <i class="fas fa-user-shield w-5"></i><span>Roles & Users</span>
             </a>
             <a href="{{ route('admin.settings.index') }}" class="nav-item flex items-center space-x-3 p-3 rounded-lg text-sm {{ request()->routeIs('admin.settings*') ? 'active' : '' }}">
@@ -111,7 +112,6 @@
     </div>
     <!-- Main Content -->
     <div class="flex-1 flex flex-col overflow-hidden">
-        <!-- Top Bar -->
         <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-4">
                 <button onclick="document.getElementById('sidebar').classList.toggle('hidden')" class="text-gray-500 hover:text-gray-700">
@@ -125,9 +125,8 @@
                 </a>
                 <a href="{{ route('admin.notifications.index') }}" class="relative text-gray-500 hover:text-orange-600">
                     <i class="fas fa-bell text-xl"></i>
-                    @if(isset($unreadCount) && $unreadCount > 0)
-                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{{ $unreadCount }}</span>
-                    @endif
+                    @php $unreadNotifCount = \App\Models\Notification::where('is_read',false)->count(); @endphp
+                    @if($unreadNotifCount > 0)<span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{{ $unreadNotifCount }}</span>@endif
                 </a>
                 <div class="flex items-center space-x-2">
                     <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
@@ -137,7 +136,6 @@
                 </div>
             </div>
         </header>
-        <!-- Flash Messages -->
         <div class="px-6 pt-4">
             @if(session('success'))
             <div class="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-lg mb-4 flex items-center justify-between animate-slide">
@@ -152,18 +150,15 @@
             </div>
             @endif
         </div>
-        <!-- Page Content -->
         <main class="flex-1 overflow-y-auto p-6">
             @yield('content')
         </main>
     </div>
 </div>
 <script>
-    // Auto-hide flash messages
     setTimeout(() => {
         document.querySelectorAll('.animate-slide').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transition = 'opacity 0.5s';
+            el.style.opacity = '0'; el.style.transition = 'opacity 0.5s';
             setTimeout(() => el.remove(), 500);
         });
     }, 4000);

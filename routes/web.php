@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\QuotationController;
 use App\Http\Controllers\Admin\SalesOrderController;
 use App\Http\Controllers\Admin\PurchaseOrderController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\InstallationController;
@@ -18,29 +19,29 @@ use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\ReportController;
-use App\Http\Controllers\Admin\EmailController;
 use App\Http\Controllers\Admin\PrintFormatController;
 use App\Http\Controllers\WebController;
 
-// Public Website
+// ── Public Website ────────────────────────────────────────────────────────────
 Route::get('/', [WebController::class, 'home'])->name('home');
 Route::get('/about', [WebController::class, 'about'])->name('about');
 Route::get('/products', [WebController::class, 'products'])->name('products');
+Route::get('/products/category/{slug}', [WebController::class, 'productCategory'])->name('products.category');
 Route::get('/packages', [WebController::class, 'packages'])->name('packages');
 Route::get('/contact', [WebController::class, 'contact'])->name('contact');
 Route::post('/contact', [WebController::class, 'contactStore'])->name('contact.store');
 Route::get('/get-quote', [WebController::class, 'getQuote'])->name('get.quote');
 Route::post('/get-quote', [WebController::class, 'getQuoteStore'])->name('get.quote.store');
 
-// Admin Auth
+// ── Admin Auth ────────────────────────────────────────────────────────────────
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
 Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.post');
 Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
-// Admin Dashboard
+// ── Admin Dashboard ───────────────────────────────────────────────────────────
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-// Customers
+// ── Customers ─────────────────────────────────────────────────────────────────
 Route::get('/admin/customers', [CustomerController::class, 'index'])->name('admin.customers.index');
 Route::get('/admin/customers/create', [CustomerController::class, 'create'])->name('admin.customers.create');
 Route::post('/admin/customers', [CustomerController::class, 'store'])->name('admin.customers.store');
@@ -49,7 +50,7 @@ Route::get('/admin/customers/{id}/edit', [CustomerController::class, 'edit'])->n
 Route::put('/admin/customers/{id}', [CustomerController::class, 'update'])->name('admin.customers.update');
 Route::delete('/admin/customers/{id}', [CustomerController::class, 'destroy'])->name('admin.customers.destroy');
 
-// CRM - Leads
+// ── Leads ─────────────────────────────────────────────────────────────────────
 Route::get('/admin/leads', [LeadController::class, 'index'])->name('admin.leads.index');
 Route::get('/admin/leads/create', [LeadController::class, 'create'])->name('admin.leads.create');
 Route::post('/admin/leads', [LeadController::class, 'store'])->name('admin.leads.store');
@@ -60,7 +61,7 @@ Route::delete('/admin/leads/{id}', [LeadController::class, 'destroy'])->name('ad
 Route::post('/admin/leads/{id}/mature', [LeadController::class, 'markMature'])->name('admin.leads.mature');
 Route::post('/admin/leads/{id}/convert', [LeadController::class, 'convertToQuotation'])->name('admin.leads.convert');
 
-// Quotations
+// ── Quotations ────────────────────────────────────────────────────────────────
 Route::get('/admin/quotations', [QuotationController::class, 'index'])->name('admin.quotations.index');
 Route::get('/admin/quotations/create', [QuotationController::class, 'create'])->name('admin.quotations.create');
 Route::post('/admin/quotations', [QuotationController::class, 'store'])->name('admin.quotations.store');
@@ -72,7 +73,7 @@ Route::get('/admin/quotations/{id}/pdf', [QuotationController::class, 'downloadP
 Route::post('/admin/quotations/{id}/send-email', [QuotationController::class, 'sendEmail'])->name('admin.quotations.send-email');
 Route::post('/admin/quotations/{id}/convert-to-order', [QuotationController::class, 'convertToOrder'])->name('admin.quotations.convert-to-order');
 
-// Sales Orders
+// ── Sales Orders ──────────────────────────────────────────────────────────────
 Route::get('/admin/sales-orders', [SalesOrderController::class, 'index'])->name('admin.sales-orders.index');
 Route::get('/admin/sales-orders/create', [SalesOrderController::class, 'create'])->name('admin.sales-orders.create');
 Route::post('/admin/sales-orders', [SalesOrderController::class, 'store'])->name('admin.sales-orders.store');
@@ -82,7 +83,7 @@ Route::put('/admin/sales-orders/{id}', [SalesOrderController::class, 'update'])-
 Route::delete('/admin/sales-orders/{id}', [SalesOrderController::class, 'destroy'])->name('admin.sales-orders.destroy');
 Route::get('/admin/sales-orders/{id}/pdf', [SalesOrderController::class, 'downloadPdf'])->name('admin.sales-orders.pdf');
 
-// Purchase Orders
+// ── Purchase Orders ───────────────────────────────────────────────────────────
 Route::get('/admin/purchase-orders', [PurchaseOrderController::class, 'index'])->name('admin.purchase-orders.index');
 Route::get('/admin/purchase-orders/create', [PurchaseOrderController::class, 'create'])->name('admin.purchase-orders.create');
 Route::post('/admin/purchase-orders', [PurchaseOrderController::class, 'store'])->name('admin.purchase-orders.store');
@@ -92,7 +93,15 @@ Route::put('/admin/purchase-orders/{id}', [PurchaseOrderController::class, 'upda
 Route::delete('/admin/purchase-orders/{id}', [PurchaseOrderController::class, 'destroy'])->name('admin.purchase-orders.destroy');
 Route::get('/admin/purchase-orders/{id}/pdf', [PurchaseOrderController::class, 'downloadPdf'])->name('admin.purchase-orders.pdf');
 
-// Products
+// ── Product Categories ────────────────────────────────────────────────────────
+Route::get('/admin/product-categories', [ProductCategoryController::class, 'index'])->name('admin.product-categories.index');
+Route::get('/admin/product-categories/create', [ProductCategoryController::class, 'create'])->name('admin.product-categories.create');
+Route::post('/admin/product-categories', [ProductCategoryController::class, 'store'])->name('admin.product-categories.store');
+Route::get('/admin/product-categories/{id}/edit', [ProductCategoryController::class, 'edit'])->name('admin.product-categories.edit');
+Route::put('/admin/product-categories/{id}', [ProductCategoryController::class, 'update'])->name('admin.product-categories.update');
+Route::delete('/admin/product-categories/{id}', [ProductCategoryController::class, 'destroy'])->name('admin.product-categories.destroy');
+
+// ── Products ──────────────────────────────────────────────────────────────────
 Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
 Route::get('/admin/products/create', [ProductController::class, 'create'])->name('admin.products.create');
 Route::post('/admin/products', [ProductController::class, 'store'])->name('admin.products.store');
@@ -101,7 +110,7 @@ Route::get('/admin/products/{id}/edit', [ProductController::class, 'edit'])->nam
 Route::put('/admin/products/{id}', [ProductController::class, 'update'])->name('admin.products.update');
 Route::delete('/admin/products/{id}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
 
-// Packages
+// ── Packages ──────────────────────────────────────────────────────────────────
 Route::get('/admin/packages', [PackageController::class, 'index'])->name('admin.packages.index');
 Route::get('/admin/packages/create', [PackageController::class, 'create'])->name('admin.packages.create');
 Route::post('/admin/packages', [PackageController::class, 'store'])->name('admin.packages.store');
@@ -110,7 +119,7 @@ Route::get('/admin/packages/{id}/edit', [PackageController::class, 'edit'])->nam
 Route::put('/admin/packages/{id}', [PackageController::class, 'update'])->name('admin.packages.update');
 Route::delete('/admin/packages/{id}', [PackageController::class, 'destroy'])->name('admin.packages.destroy');
 
-// Inventory
+// ── Inventory ─────────────────────────────────────────────────────────────────
 Route::get('/admin/inventory', [InventoryController::class, 'index'])->name('admin.inventory.index');
 Route::get('/admin/inventory/create', [InventoryController::class, 'create'])->name('admin.inventory.create');
 Route::post('/admin/inventory', [InventoryController::class, 'store'])->name('admin.inventory.store');
@@ -119,7 +128,7 @@ Route::put('/admin/inventory/{id}', [InventoryController::class, 'update'])->nam
 Route::get('/admin/inventory/adjust', [InventoryController::class, 'adjust'])->name('admin.inventory.adjust');
 Route::post('/admin/inventory/adjust', [InventoryController::class, 'adjustStore'])->name('admin.inventory.adjust.store');
 
-// Installations
+// ── Installations ─────────────────────────────────────────────────────────────
 Route::get('/admin/installations', [InstallationController::class, 'index'])->name('admin.installations.index');
 Route::get('/admin/installations/create', [InstallationController::class, 'create'])->name('admin.installations.create');
 Route::post('/admin/installations', [InstallationController::class, 'store'])->name('admin.installations.store');
@@ -128,7 +137,7 @@ Route::get('/admin/installations/{id}/edit', [InstallationController::class, 'ed
 Route::put('/admin/installations/{id}', [InstallationController::class, 'update'])->name('admin.installations.update');
 Route::delete('/admin/installations/{id}', [InstallationController::class, 'destroy'])->name('admin.installations.destroy');
 
-// Services
+// ── Services ──────────────────────────────────────────────────────────────────
 Route::get('/admin/services', [ServiceController::class, 'index'])->name('admin.services.index');
 Route::get('/admin/services/create', [ServiceController::class, 'create'])->name('admin.services.create');
 Route::post('/admin/services', [ServiceController::class, 'store'])->name('admin.services.store');
@@ -137,7 +146,7 @@ Route::get('/admin/services/{id}/edit', [ServiceController::class, 'edit'])->nam
 Route::put('/admin/services/{id}', [ServiceController::class, 'update'])->name('admin.services.update');
 Route::delete('/admin/services/{id}', [ServiceController::class, 'destroy'])->name('admin.services.destroy');
 
-// Employees
+// ── Employees ─────────────────────────────────────────────────────────────────
 Route::get('/admin/employees', [EmployeeController::class, 'index'])->name('admin.employees.index');
 Route::get('/admin/employees/create', [EmployeeController::class, 'create'])->name('admin.employees.create');
 Route::post('/admin/employees', [EmployeeController::class, 'store'])->name('admin.employees.store');
@@ -148,13 +157,13 @@ Route::delete('/admin/employees/{id}', [EmployeeController::class, 'destroy'])->
 Route::get('/admin/employees/{id}/salary', [EmployeeController::class, 'salary'])->name('admin.employees.salary');
 Route::post('/admin/employees/{id}/salary', [EmployeeController::class, 'salaryStore'])->name('admin.employees.salary.store');
 
-// Notifications
+// ── Notifications ─────────────────────────────────────────────────────────────
 Route::get('/admin/notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
 Route::post('/admin/notifications/{id}/read', [NotificationController::class, 'markRead'])->name('admin.notifications.read');
 Route::post('/admin/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('admin.notifications.read-all');
 Route::get('/admin/notifications/count', [NotificationController::class, 'count'])->name('admin.notifications.count');
 
-// Roles & Permissions
+// ── Roles & Users ─────────────────────────────────────────────────────────────
 Route::get('/admin/roles', [RoleController::class, 'index'])->name('admin.roles.index');
 Route::get('/admin/roles/create', [RoleController::class, 'create'])->name('admin.roles.create');
 Route::post('/admin/roles', [RoleController::class, 'store'])->name('admin.roles.store');
@@ -168,7 +177,7 @@ Route::get('/admin/users/{id}/edit', [RoleController::class, 'editUser'])->name(
 Route::put('/admin/users/{id}', [RoleController::class, 'updateUser'])->name('admin.users.update');
 Route::delete('/admin/users/{id}', [RoleController::class, 'destroyUser'])->name('admin.users.destroy');
 
-// Settings
+// ── Settings ──────────────────────────────────────────────────────────────────
 Route::get('/admin/settings', [SettingsController::class, 'index'])->name('admin.settings.index');
 Route::post('/admin/settings', [SettingsController::class, 'update'])->name('admin.settings.update');
 Route::get('/admin/settings/email', [SettingsController::class, 'email'])->name('admin.settings.email');
@@ -185,7 +194,7 @@ Route::get('/admin/settings/print-formats/{id}/edit', [PrintFormatController::cl
 Route::put('/admin/settings/print-formats/{id}', [PrintFormatController::class, 'update'])->name('admin.settings.print-formats.update');
 Route::delete('/admin/settings/print-formats/{id}', [PrintFormatController::class, 'destroy'])->name('admin.settings.print-formats.destroy');
 
-// Reports
+// ── Reports ───────────────────────────────────────────────────────────────────
 Route::get('/admin/reports', [ReportController::class, 'index'])->name('admin.reports.index');
 Route::get('/admin/reports/sales', [ReportController::class, 'sales'])->name('admin.reports.sales');
 Route::get('/admin/reports/purchase', [ReportController::class, 'purchase'])->name('admin.reports.purchase');
