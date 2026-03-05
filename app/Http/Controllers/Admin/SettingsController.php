@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Models\EmailTemplate;
+use App\Models\SmsConfiguration;
+use App\Models\SmsTemplate;
+use App\Models\PrintFormat;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
 
 class SettingsController extends Controller
 {
@@ -41,14 +43,14 @@ class SettingsController extends Controller
     {
         if (!session('admin_logged_in')) return redirect()->route('admin.login');
         $validated = $request->validate([
-            'mail_driver' => 'required|in:smtp,sendmail,mailgun',
-            'mail_host' => 'required|string',
-            'mail_port' => 'required|integer',
-            'mail_username' => 'required|string',
-            'mail_password' => 'required|string',
-            'mail_encryption' => 'required|in:tls,ssl,none',
+            'mail_driver'       => 'required|in:smtp,sendmail,mailgun',
+            'mail_host'         => 'required|string',
+            'mail_port'         => 'required|integer',
+            'mail_username'     => 'required|string',
+            'mail_password'     => 'required|string',
+            'mail_encryption'   => 'required|in:tls,ssl,none',
             'mail_from_address' => 'required|email',
-            'mail_from_name' => 'required|string'
+            'mail_from_name'    => 'required|string',
         ]);
         foreach ($validated as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
@@ -67,11 +69,10 @@ class SettingsController extends Controller
     {
         if (!session('admin_logged_in')) return redirect()->route('admin.login');
         $validated = $request->validate([
-            'name' => 'required|string',
-            'type' => 'required|in:quotation,sales_order,invoice,follow_up,welcome,reminder',
-            'subject' => 'required|string',
-            'body' => 'required|string',
-            'is_active' => 'boolean'
+            'name'      => 'required|string',
+            'type'      => 'required|in:quotation,sales_order,invoice,follow_up,welcome,reminder,thank_you',
+            'subject'   => 'required|string',
+            'body'      => 'required|string',
         ]);
         $validated['is_active'] = $request->has('is_active');
         EmailTemplate::create($validated);
@@ -88,13 +89,8 @@ class SettingsController extends Controller
     public function emailTemplateUpdate(Request $request, $id)
     {
         if (!session('admin_logged_in')) return redirect()->route('admin.login');
-        $template = EmailTemplate::findOrFail($id);
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'type' => 'required|string',
-            'subject' => 'required|string',
-            'body' => 'required|string'
-        ]);
+        $template  = EmailTemplate::findOrFail($id);
+        $validated = $request->validate(['name' => 'required|string', 'type' => 'required|string', 'subject' => 'required|string', 'body' => 'required|string']);
         $validated['is_active'] = $request->has('is_active');
         $template->update($validated);
         return redirect()->route('admin.settings.email-templates')->with('success', 'Template updated!');
@@ -106,4 +102,70 @@ class SettingsController extends Controller
         EmailTemplate::findOrFail($id)->delete();
         return redirect()->route('admin.settings.email-templates')->with('success', 'Template deleted!');
     }
+
+    // ── SMS Configuration ──────────────────────────────────────────────────────
+    public function sms()
+    {
+        if (!session('admin_logged_in')) return redirect()->route('admin.login');
+        $config    = SmsConfiguration::first();
+        $templates = SmsTemplate::orderBy('type')->get();
+        return view('admin.settings.sms', compact('config', 'templates'));
+    }
+
+    public function smsUpdate(Request $request)
+    {
+        if (!session('admin_logged_in')) return redirect()->route('admin.login');
+        $validated = $request->validate([
+            'provider'    => 'required|in:twilio,msg91,fast2sms,textlocal',
+            'account_sid' => 'nullable|string',
+            'auth_token'  => 'nullable|string',
+            'from_number' => 'nullable|string',
+            'api_key'     => 'nullable|string',
+            'sender_id'   => 'nullable|string',
+        ]);
+        $validated['is_active'] = $request->has('is_active');
+        SmsConfiguration::updateOrCreate(['id' => 1], $validated);
+        return redirect()->back()->with('success', 'SMS configuration saved!');
+    }
+
+    public function smsTemplateStore(Request $request)
+    {
+        if (!session('admin_logged_in')) return redirect()->route('admin.login');
+        $validated = $request->validate([
+            'name'    => 'required|string',
+            'type'    => 'required|string',
+            'message' => 'required|string|max:500',
+        ]);
+        $validated['is_active'] = $request->has('is_active');
+        SmsTemplate::create($validated);
+        return redirect()->route('admin.settings.sms')->with('success', 'SMS template created!');
+    }
+
+    public function smsTemplateUpdate(Request $request, $id)
+    {
+        if (!session('admin_logged_in')) return redirect()->route('admin.login');
+        $template  = SmsTemplate::findOrFail($id);
+        $validated = $request->validate(['name' => 'required|string', 'type' => 'required|string', 'message' => 'required|string|max:500']);
+        $validated['is_active'] = $request->has('is_active');
+        $template->update($validated);
+        return redirect()->route('admin.settings.sms')->with('success', 'SMS template updated!');
+    }
+
+    public function smsTemplateDestroy($id)
+    {
+        if (!session('admin_logged_in')) return redirect()->route('admin.login');
+        SmsTemplate::findOrFail($id)->delete();
+        return redirect()->route('admin.settings.sms')->with('success', 'SMS template deleted!');
+    }
+
+    public function smsSendTest(Request $request)
+    {
+        if (!session('admin_logged_in')) return redirect()->route('admin.login');
+        $request->validate(['test_number' => 'required|string', 'test_message' => 'required|string']);
+        $sms  = app(\App\Services\SmsService::class);
+        $sent = $sms->send($request->test_number, $request->test_message, 'test');
+        return redirect()->back()->with($sent ? 'success' : 'error', $sent ? 'Test SMS sent!' : 'Test SMS failed. Check configuration.');
+    }
+
+    // ── Print Formats (delegated to PrintFormatController) handled via routes
 }

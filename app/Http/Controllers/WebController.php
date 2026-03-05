@@ -7,10 +7,21 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Lead;
 use App\Models\Setting;
+use App\Models\Customer;
+use App\Models\Notification;
+use App\Services\SmsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class WebController extends Controller
 {
+    private SmsService $sms;
+
+    public function __construct(SmsService $sms)
+    {
+        $this->sms = $sms;
+    }
+
     private function getSettings()
     {
         return Setting::pluck('value', 'key')->toArray();
@@ -40,16 +51,16 @@ class WebController extends Controller
             $cat = ProductCategory::where('slug', $request->category)->first();
             if ($cat) $query->where('category_id', $cat->id);
         }
-        $products        = $query->orderBy('name')->paginate(12)->appends($request->only('category'));
-        $activeCategory  = $request->category;
+        $products       = $query->orderBy('name')->paginate(12)->appends($request->only('category'));
+        $activeCategory = $request->category;
         return view('web.products', compact('settings', 'products', 'categories', 'activeCategory'));
     }
 
     public function productCategory($slug)
     {
-        $settings = $this->getSettings();
-        $category = ProductCategory::where('slug', $slug)->where('is_active', true)->firstOrFail();
-        $products = Product::where('is_active', true)->where('category_id', $category->id)->with('productCategory')->paginate(12);
+        $settings   = $this->getSettings();
+        $category   = ProductCategory::where('slug', $slug)->where('is_active', true)->firstOrFail();
+        $products   = Product::where('is_active', true)->where('category_id', $category->id)->with('productCategory')->paginate(12);
         $categories = ProductCategory::where('is_active', true)->withCount('products')->orderBy('sort_order')->get();
         return view('web.products', compact('settings', 'products', 'categories', 'category'));
     }
@@ -69,23 +80,29 @@ class WebController extends Controller
 
     public function contactStore(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name'    => 'required|string|max:255',
             'email'   => 'required|email',
-            'phone'   => 'required|string',
-            'message' => 'required|string',
+            'phone'   => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',
+            'message' => 'required|string|min:10',
         ]);
-        Lead::create([
-            'name'        => $validated['name'],
-            'email'       => $validated['email'],
-            'phone'       => $validated['phone'],
+
+        $leadNumber = 'LEAD-' . date('Ymd') . '-' . rand(100, 999);
+        $lead = Lead::create([
+            'lead_number' => $leadNumber,
+            'name'        => $request->name,
+            'email'       => $request->email,
+            'phone'       => $request->phone,
             'address'     => 'Contact Form Inquiry',
             'lead_source' => 'website',
             'status'      => 'new',
-            'notes'       => $validated['message'],
-            'lead_number' => 'LEAD-' . date('Ymd') . '-' . rand(100, 999),
+            'notes'       => $request->message,
         ]);
-        return redirect()->back()->with('success', 'Thank you! We will contact you shortly.');
+
+        $this->sendLeadAcknowledgement($lead);
+        Notification::create(['title' => 'Contact Form Submission', 'message' => $request->name . ' sent a contact message.', 'type' => 'lead', 'related_id' => $lead->id, 'related_type' => 'Lead']);
+
+        return redirect()->route('thank.you', ['type' => 'contact']);
     }
 
     public function getQuote()
@@ -97,22 +114,76 @@ class WebController extends Controller
 
     public function getQuoteStore(Request $request)
     {
-        $validated = $request->validate([
-            'name'         => 'required|string',
-            'email'        => 'required|email',
-            'phone'        => 'required|string',
-            'address'      => 'required|string',
-            'package_id'   => 'nullable|exists:packages,id',
-            'system_size'  => 'nullable|string',
-            'roof_type'    => 'nullable|string',
-            'monthly_bill' => 'nullable|string',
+        $request->validate([
+            'name'                    => 'required|string|max:255',
+            'email'                   => 'required|email',
+            'phone'                   => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',
+            'address'                 => 'required|string|min:5',
+            'k_number'                => 'nullable|string|max:50',
+            'monthly_electricity_bill'=> 'nullable|numeric|min:0',
+            'required_load_kw'        => 'nullable|string',
+            'meter_type'              => 'nullable|in:single_phase,three_phase',
+            'property_type'           => 'nullable|string',
+            'roof_type'               => 'nullable|string',
+            'roof_area_sqft'          => 'nullable|string',
+            'has_subsidy'             => 'nullable|boolean',
+            'package_id'              => 'nullable|exists:packages,id',
+            'monthly_bill'            => 'nullable|string',
         ]);
-        Lead::create(array_merge($validated, [
-            'lead_source' => 'website',
-            'status'      => 'new',
-            'lead_number' => 'LEAD-' . date('Ymd') . '-' . rand(100, 999),
-            'notes'       => 'Monthly Bill: ' . ($validated['monthly_bill'] ?? 'N/A') . ', System Size: ' . ($validated['system_size'] ?? 'N/A'),
-        ]));
-        return redirect()->back()->with('success', 'Quote request submitted! Our team will contact you within 24 hours.');
+
+        $leadNumber = 'LEAD-' . date('Ymd') . '-' . rand(100, 999);
+        $lead = Lead::create([
+            'lead_number'             => $leadNumber,
+            'name'                    => $request->name,
+            'email'                   => $request->email,
+            'phone'                   => $request->phone,
+            'address'                 => $request->address,
+            'lead_source'             => 'website',
+            'status'                  => 'new',
+            'package_id'              => $request->package_id,
+            'k_number'                => $request->k_number,
+            'monthly_electricity_bill'=> $request->monthly_electricity_bill,
+            'required_load_kw'        => $request->required_load_kw,
+            'meter_type'              => $request->meter_type,
+            'property_type'           => $request->property_type,
+            'roof_type'               => $request->roof_type,
+            'roof_area_sqft'          => $request->roof_area_sqft,
+            'has_subsidy'             => $request->has('has_subsidy'),
+            'notes'                   => 'Monthly Bill: ' . ($request->monthly_bill ?? ($request->monthly_electricity_bill ? '₹' . $request->monthly_electricity_bill : 'N/A')),
+        ]);
+
+        $this->sendLeadAcknowledgement($lead);
+        Notification::create(['title' => 'New Quote Request from Website', 'message' => $lead->name . ' submitted a solar quote request. Lead: ' . $leadNumber, 'type' => 'lead', 'related_id' => $lead->id, 'related_type' => 'Lead']);
+
+        return redirect()->route('thank.you', ['type' => 'quote']);
+    }
+
+    public function thankYou(Request $request)
+    {
+        $settings = $this->getSettings();
+        $type     = $request->query('type', 'contact');
+        return view('web.thank-you', compact('settings', 'type'));
+    }
+
+    private function sendLeadAcknowledgement(Lead $lead): void
+    {
+        // SMS
+        $this->sms->sendFromTemplate('thank_you', $lead->phone, $lead->name, [
+            'name'        => $lead->name,
+            'lead_number' => $lead->lead_number,
+            'company'     => 'SolarTech Solutions',
+        ], 'Lead', $lead->id);
+
+        // Email
+        try {
+            $subject = 'Thank You for Your Solar Enquiry - ' . $lead->lead_number;
+            $body    = view('emails.lead-acknowledgement', compact('lead'))->render();
+            Mail::send([], [], function ($msg) use ($lead, $subject, $body) {
+                $msg->to($lead->email, $lead->name)->subject($subject)->html($body);
+            });
+            $lead->update(['email_sent' => true]);
+        } catch (\Exception $e) {
+            // silent
+        }
     }
 }

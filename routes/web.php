@@ -32,6 +32,7 @@ Route::get('/contact', [WebController::class, 'contact'])->name('contact');
 Route::post('/contact', [WebController::class, 'contactStore'])->name('contact.store');
 Route::get('/get-quote', [WebController::class, 'getQuote'])->name('get.quote');
 Route::post('/get-quote', [WebController::class, 'getQuoteStore'])->name('get.quote.store');
+Route::get('/thank-you', [WebController::class, 'thankYou'])->name('thank.you');
 
 // ── Admin Auth ────────────────────────────────────────────────────────────────
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
@@ -60,6 +61,7 @@ Route::put('/admin/leads/{id}', [LeadController::class, 'update'])->name('admin.
 Route::delete('/admin/leads/{id}', [LeadController::class, 'destroy'])->name('admin.leads.destroy');
 Route::post('/admin/leads/{id}/mature', [LeadController::class, 'markMature'])->name('admin.leads.mature');
 Route::post('/admin/leads/{id}/convert', [LeadController::class, 'convertToQuotation'])->name('admin.leads.convert');
+Route::post('/admin/leads/{id}/send-sms', [LeadController::class, 'sendSms'])->name('admin.leads.send-sms');
 
 // ── Quotations ────────────────────────────────────────────────────────────────
 Route::get('/admin/quotations', [QuotationController::class, 'index'])->name('admin.quotations.index');
@@ -187,6 +189,12 @@ Route::post('/admin/settings/email-templates', [SettingsController::class, 'emai
 Route::get('/admin/settings/email-templates/{id}/edit', [SettingsController::class, 'emailTemplateEdit'])->name('admin.settings.email-templates.edit');
 Route::put('/admin/settings/email-templates/{id}', [SettingsController::class, 'emailTemplateUpdate'])->name('admin.settings.email-templates.update');
 Route::delete('/admin/settings/email-templates/{id}', [SettingsController::class, 'emailTemplateDestroy'])->name('admin.settings.email-templates.destroy');
+Route::get('/admin/settings/sms', [SettingsController::class, 'sms'])->name('admin.settings.sms');
+Route::post('/admin/settings/sms', [SettingsController::class, 'smsUpdate'])->name('admin.settings.sms.update');
+Route::post('/admin/settings/sms-templates', [SettingsController::class, 'smsTemplateStore'])->name('admin.settings.sms-templates.store');
+Route::put('/admin/settings/sms-templates/{id}', [SettingsController::class, 'smsTemplateUpdate'])->name('admin.settings.sms-templates.update');
+Route::delete('/admin/settings/sms-templates/{id}', [SettingsController::class, 'smsTemplateDestroy'])->name('admin.settings.sms-templates.destroy');
+Route::post('/admin/settings/sms/test', [SettingsController::class, 'smsSendTest'])->name('admin.settings.sms.test');
 Route::get('/admin/settings/print-formats', [PrintFormatController::class, 'index'])->name('admin.settings.print-formats');
 Route::get('/admin/settings/print-formats/create', [PrintFormatController::class, 'create'])->name('admin.settings.print-formats.create');
 Route::post('/admin/settings/print-formats', [PrintFormatController::class, 'store'])->name('admin.settings.print-formats.store');
