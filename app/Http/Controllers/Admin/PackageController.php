@@ -76,6 +76,11 @@ class PackageController extends Controller
         ]);
         $validated['is_active'] = $request->has('is_active');
         $validated['is_featured'] = $request->has('is_featured');
+        if ($request->items) {
+            $validated['items'] = json_encode($request->items);
+        } else {
+            $validated['items'] = null; // Clear items if none provided
+        }
         $package->update($validated);
         return redirect()->route('admin.packages.index')->with('success', 'Package updated!');
     }

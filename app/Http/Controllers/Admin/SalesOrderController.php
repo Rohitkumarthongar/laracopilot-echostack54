@@ -7,6 +7,7 @@ use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\Package;
 use App\Models\Notification;
 use App\Models\Setting;
 use Illuminate\Http\Request;
@@ -24,8 +25,9 @@ class SalesOrderController extends Controller
     {
         if (!session('admin_logged_in')) return redirect()->route('admin.login');
         $customers = Customer::orderBy('name')->get();
-        $products = Product::where('is_active', true)->get();
-        return view('admin.sales-orders.create', compact('customers', 'products'));
+        $products  = Product::where('is_active', true)->get();
+        $packages  = Package::where('is_active', true)->orderBy('name')->get();
+        return view('admin.sales-orders.create', compact('customers', 'products', 'packages'));
     }
 
     public function store(Request $request)
@@ -94,7 +96,8 @@ class SalesOrderController extends Controller
         $order = SalesOrder::with('items')->findOrFail($id);
         $customers = Customer::orderBy('name')->get();
         $products = Product::where('is_active', true)->get();
-        return view('admin.sales-orders.edit', compact('order', 'customers', 'products'));
+        $packages  = Package::where('is_active', true)->orderBy('name')->get();
+        return view('admin.sales-orders.edit', compact('order', 'customers', 'products', 'packages'));
     }
 
     public function update(Request $request, $id)

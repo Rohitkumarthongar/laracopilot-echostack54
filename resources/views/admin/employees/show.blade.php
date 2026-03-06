@@ -1,0 +1,176 @@
+@extends('layouts.admin')
+
+@section('title', 'Profile - ' . $employee->name)
+@section('page-title', 'Employee Management')
+
+@section('content')
+<div class="space-y-6">
+
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.employees.index') }}"
+                class="w-9 h-9 flex items-center justify-center rounded-xl bg-white shadow-sm border border-gray-200 text-gray-500 hover:text-indigo-600 transition">
+                <i class="fas fa-arrow-left text-sm"></i>
+            </a>
+            <div>
+                <h2 class="text-xl font-bold text-gray-800">{{ $employee->name }}</h2>
+                <div class="flex items-center gap-2 mt-0.5">
+                    <span class="text-[10px] font-bold px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full border border-indigo-200 uppercase">
+                        {{ $employee->employee_code }}
+                    </span>
+                    <span class="text-xs text-gray-400 font-medium">Joined on {{ \Carbon\Carbon::parse($employee->joining_date)->format('d M, Y') }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex gap-2">
+            <a href="{{ route('admin.employees.salary', $employee->id) }}"
+                class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition shadow-sm">
+                <i class="fas fa-money-bill-wave"></i> Payroll Center
+            </a>
+            <a href="{{ route('admin.employees.edit', $employee->id) }}"
+                class="inline-flex items-center gap-2 bg-white border border-gray-200 text-indigo-600 text-sm font-semibold px-4 py-2.5 rounded-xl transition hover:bg-gray-50">
+                <i class="fas fa-user-edit"></i> Edit Records
+            </a>
+        </div>
+    </div>
+
+    @if(session('success'))
+    <div class="bg-green-50 border border-green-200 text-green-700 rounded-xl px-5 py-3 flex items-center gap-3">
+        <i class="fas fa-check-circle text-green-500"></i> {{ session('success') }}
+    </div>
+    @endif
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+        {{-- Main Info Cards --}}
+        <div class="xl:col-span-2 space-y-6">
+            
+            {{-- Quick Stats --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Status</p>
+                    <div class="flex items-center gap-2">
+                        @if($employee->is_active)
+                            <div class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></div>
+                            <span class="font-bold text-gray-800">Active Employee</span>
+                        @else
+                            <div class="w-2.5 h-2.5 bg-red-400 rounded-full"></div>
+                            <span class="font-bold text-gray-500 italic">Terminated / Inactive</span>
+                        @endif
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Department</p>
+                    <span class="font-bold text-gray-800 capitalize">{{ $employee->department }}</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Basic Salary</p>
+                    <span class="font-bold text-indigo-600">₹{{ number_format($employee->basic_salary, 2) }}</span>
+                </div>
+            </div>
+
+            {{-- Experience & Role --}}
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <h3 class="font-bold text-gray-800 text-sm border-b border-gray-100 pb-3 mb-5">
+                    <i class="fas fa-file-invoice text-indigo-500 mr-2"></i> Employee Dossier
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <div class="flex flex-col">
+                            <span class="text-xs text-gray-400 font-medium">Designation</span>
+                            <span class="font-bold text-gray-800 text-lg leading-tight">{{ $employee->designation }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs text-gray-400 font-medium">Email Address</span>
+                            <span class="font-bold text-indigo-600">{{ $employee->email }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs text-gray-400 font-medium">Phone Contact</span>
+                            <span class="font-bold text-gray-800">{{ $employee->phone }}</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-xl p-5 border border-indigo-50">
+                        <span class="text-[10px] text-indigo-400 font-bold uppercase tracking-widest mb-2 block">Registered Address</span>
+                        <p class="text-sm text-gray-600 leading-relaxed font-medium">
+                            {{ $employee->address ?? 'No address information provided on record.' }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Recent Payroll Activity (Mini) --}}
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <h3 class="font-bold text-gray-800 text-sm">Recent Salary Settlements</h3>
+                    <a href="{{ route('admin.employees.salary', $employee->id) }}" class="text-[10px] text-indigo-600 font-black uppercase hover:underline">View All &raquo;</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left">
+                        <thead class="bg-gray-50 text-gray-400 font-bold uppercase text-[9px] border-b border-gray-50">
+                            <tr>
+                                <th class="px-6 py-3">Pay Period</th>
+                                <th class="px-6 py-3">Net Amount</th>
+                                <th class="px-6 py-3">Paid Date</th>
+                                <th class="px-6 py-3 text-right">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @forelse($employee->salaryRecords->sortByDesc('payment_date')->take(5) as $rec)
+                            <tr>
+                                <td class="px-6 py-3 font-bold text-gray-700">{{ date('F', mktime(0,0,0, $rec->month, 1)) }} {{ $rec->year }}</td>
+                                <td class="px-6 py-3 font-black text-indigo-600">₹{{ number_format($rec->net_salary, 2) }}</td>
+                                <td class="px-6 py-3 text-gray-500">{{ \Carbon\Carbon::parse($rec->payment_date)->format('d/m/y') }}</td>
+                                <td class="px-6 py-3 text-right">
+                                    <span class="bg-green-100 text-green-700 text-[8px] font-black px-1.5 py-0.5 rounded uppercase">Success</span>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-8 text-center text-gray-300 italic">No payment history available.</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        {{-- Sidebar Stats Card --}}
+        <div class="space-y-6">
+            <div class="bg-gray-800 rounded-2xl shadow-sm p-6 text-white border-b-8 border-indigo-500 relative overflow-hidden">
+                <i class="fas fa-id-card absolute -right-4 -bottom-4 text-7xl text-white/5 rotate-12"></i>
+                <h3 class="font-bold text-indigo-300 text-xs uppercase tracking-widest mb-6">Financial Summary</h3>
+                
+                <div class="space-y-5">
+                    <div>
+                        <p class="text-[10px] text-white/40 font-medium">Total Lifetime Earnings</p>
+                        <p class="text-2xl font-black">₹{{ number_format($employee->salaryRecords->sum('net_salary'), 2) }}</p>
+                    </div>
+                    <div class="flex items-center justify-between border-t border-white/10 pt-4">
+                        <div>
+                            <p class="text-[10px] text-white/40 font-medium">Total Settlements</p>
+                            <p class="text-lg font-bold">{{ $employee->salaryRecords->count() }} Payments</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <h3 class="font-bold text-gray-800 text-xs uppercase mb-4">Internal Settings</h3>
+                <form action="{{ route('admin.employees.destroy', $employee->id) }}" method="POST"
+                    onsubmit="return confirm('CRITICAL: Delete employee records? This cannot be undone.');">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="w-full py-3 text-xs font-bold text-red-100 bg-red-50 hover:bg-red-500 hover:text-white rounded-xl transition flex justify-center items-center gap-2 border border-red-100">
+                        <i class="fas fa-trash-alt"></i> Delete Employee Account
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+@endsection
