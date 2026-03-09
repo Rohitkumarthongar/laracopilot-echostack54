@@ -23,11 +23,7 @@
         </a>
     </div>
 
-    @if(session('success'))
-    <div class="bg-green-50 border border-green-200 text-green-700 rounded-xl px-5 py-3 flex items-center gap-3">
-        <i class="fas fa-check-circle text-green-500"></i> {{ session('success') }}
-    </div>
-    @endif
+    {{-- Success alerts are now handled globally via SweetAlert --}}
 
     <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
         <div class="overflow-x-auto">
@@ -75,7 +71,8 @@
                                     class="w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition">
                                     <i class="fas fa-edit text-[10px]"></i>
                                 </a>
-                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Revoke this administrator\'s access?');">
+                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" 
+                                    class="delete-form" data-title="Revoke Admin Access?" data-text="This will immediately block {{ $user->name }} from accessing the panel.">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition">
                                         <i class="fas fa-trash-alt text-[10px]"></i>

@@ -7,54 +7,103 @@
     <meta name="description" content="@yield('meta_description', 'Premium solar solutions for homes and businesses. Quality panels, inverters, batteries and complete installation services.')">    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    @php $settings = \App\Models\Setting::pluck('value', 'key')->toArray(); @endphp
     <style>
+        :root {
+            --primary: #f59e0b;
+            --primary-dark: #d97706;
+            --secondary: #1e293b;
+            --dark-bg: #0f172a;
+            --dark-card: #1e293b;
+        }
+        body { font-family: 'Outfit', sans-serif; position: relative; }
+        .font-inter { font-family: 'Inter', sans-serif; }
         html { scroll-behavior: smooth; }
-        .hero-bg { background: linear-gradient(135deg, #ea580c 0%, #d97706 50%, #ca8a04 100%); }
-        .nav-link { position: relative; }
-        .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: #ea580c; transition: width .3s; }
+        
+        /* Noise Texture Layer */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.03;
+            z-index: 100;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .hero-bg { background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.95)), url('{{ asset("storage/hero-solar.jpg") }}'); background-size: cover; background-position: center; }
+        .nav-link { position: relative; transition: color 0.3s; }
+        .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: var(--primary); transition: width .3s; }
         .nav-link:hover::after, .nav-link.active::after { width: 100%; }
-        .card-hover { transition: transform .3s, box-shadow .3s; }
-        .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,.12); }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-up { animation: fadeUp .6s ease forwards; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px border rgba(255, 255, 255, 0.1); }
+        .card-hover { transition: all .4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-10px); background: rgba(255, 255, 255, 0.08); border-color: var(--primary); }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-up { animation: fadeUp .8s ease forwards; }
+        .text-gradient { background: linear-gradient(to right, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 5px; border: 2px solid #0f172a; }
+        ::-webkit-scrollbar-thumb:hover { background: #f59e0b; }
+        
+        ::selection { background: #f59e0b; color: #fff; }
     </style>
 </head>
-<body class="font-sans bg-white text-gray-800">
+<body class="bg-[#0f172a] text-gray-200">
 <!-- Navbar -->
-<nav class="bg-white shadow-md sticky top-0 z-50">
+<nav class="glass sticky top-0 z-50 border-b border-white/5">
     <div class="max-w-7xl mx-auto px-4">
-        <div class="flex items-center justify-between h-16">
+        <div class="flex items-center justify-between h-20">
             <a href="{{ route('home') }}" class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-500 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-solar-panel text-white text-lg"></i>
+                <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
+                    <i class="fas fa-sun text-white text-lg"></i>
                 </div>
                 <div>
-                    <span class="font-bold text-lg text-gray-800">SolarTech</span>
-                    <span class="text-orange-500 font-bold text-lg"> Solutions</span>
+                    <span class="font-bold text-xl text-white tracking-tight">{{ explode(' ', $settings['company_name'] ?? 'SolarVolt Solutions')[0] }}</span>
+                    <span class="text-amber-500 font-bold text-xl tracking-tight">{{ explode(' ', $settings['company_name'] ?? 'SolarVolt Solutions')[1] ?? '' }}</span>
                 </div>
             </a>
             <!-- Desktop Nav -->
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="{{ route('home') }}" class="nav-link text-gray-700 hover:text-orange-600 font-medium {{ request()->routeIs('home') ? 'active text-orange-600' : '' }}">Home</a>
-                <a href="{{ route('about') }}" class="nav-link text-gray-700 hover:text-orange-600 font-medium {{ request()->routeIs('about') ? 'active text-orange-600' : '' }}">About</a>
-                <a href="{{ route('products') }}" class="nav-link text-gray-700 hover:text-orange-600 font-medium {{ request()->routeIs('products*') ? 'active text-orange-600' : '' }}">Products</a>
-                <a href="{{ route('packages') }}" class="nav-link text-gray-700 hover:text-orange-600 font-medium {{ request()->routeIs('packages') ? 'active text-orange-600' : '' }}">Packages</a>
-                <a href="{{ route('contact') }}" class="nav-link text-gray-700 hover:text-orange-600 font-medium {{ request()->routeIs('contact') ? 'active text-orange-600' : '' }}">Contact</a>
-                <a href="{{ route('get.quote') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-full font-semibold transition-colors">Get Free Quote</a>
+            <div class="hidden md:flex items-center space-x-10">
+                <div class="flex items-center space-x-8">
+                    <a href="{{ route('home') }}" class="nav-link text-gray-400 hover:text-white font-bold text-sm uppercase tracking-widest {{ request()->routeIs('home') ? 'active text-white' : '' }}">Home</a>
+                    <a href="{{ route('about') }}" class="nav-link text-gray-400 hover:text-white font-bold text-sm uppercase tracking-widest {{ request()->routeIs('about') ? 'active text-white' : '' }}">Why Us</a>
+                    <a href="{{ route('products') }}" class="nav-link text-gray-400 hover:text-white font-bold text-sm uppercase tracking-widest {{ request()->routeIs('products*') ? 'active text-white' : '' }}">Products</a>
+                    <a href="{{ route('packages') }}" class="nav-link text-gray-400 hover:text-white font-bold text-sm uppercase tracking-widest {{ request()->routeIs('packages') ? 'active text-white' : '' }}">Packages</a>
+                    <a href="{{ route('contact') }}" class="nav-link text-gray-400 hover:text-white font-bold text-sm uppercase tracking-widest {{ request()->routeIs('contact') ? 'active text-white' : '' }}">Contact</a>
+                </div>
+                
+                <div class="h-6 w-px bg-white/10"></div>
+
+                <div class="flex items-center gap-5">
+                    <a href="{{ route('admin.login') }}" class="group flex items-center gap-3 text-gray-500 hover:text-white transition-all">
+                        <span class="text-[10px] font-black uppercase tracking-widest hidden lg:block opacity-0 group-hover:opacity-100 transition-opacity">Portal</span>
+                        <div class="w-10 h-10 glass rounded-xl flex items-center justify-center border border-white/5 group-hover:border-amber-500/50 group-hover:bg-amber-500/10 transition-all">
+                            <i class="fas fa-shield-halved text-xs"></i>
+                        </div>
+                    </a>
+                    <a href="{{ route('get.quote') }}" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-tighter transition-all shadow-xl shadow-amber-500/20 active:scale-95">Get a Quote</a>
+                </div>
             </div>
             <!-- Mobile toggle -->
-            <button class="md:hidden text-gray-600" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+            <button class="md:hidden text-white" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
                 <i class="fas fa-bars text-xl"></i>
             </button>
         </div>
         <!-- Mobile Menu -->
-        <div id="mobileMenu" class="hidden md:hidden border-t border-gray-100 py-4 space-y-3">
-            <a href="{{ route('home') }}" class="block text-gray-700 hover:text-orange-600 font-medium py-2">Home</a>
-            <a href="{{ route('about') }}" class="block text-gray-700 hover:text-orange-600 font-medium py-2">About</a>
-            <a href="{{ route('products') }}" class="block text-gray-700 hover:text-orange-600 font-medium py-2">Products</a>
-            <a href="{{ route('packages') }}" class="block text-gray-700 hover:text-orange-600 font-medium py-2">Packages</a>
-            <a href="{{ route('contact') }}" class="block text-gray-700 hover:text-orange-600 font-medium py-2">Contact</a>
-            <a href="{{ route('get.quote') }}" class="block bg-orange-500 text-white text-center px-5 py-2 rounded-full font-semibold">Get Free Quote</a>
+        <div id="mobileMenu" class="hidden md:hidden border-t border-white/5 py-4 space-y-3">
+            <a href="{{ route('home') }}" class="block text-gray-300 hover:text-amber-500 font-medium py-2">Home</a>
+            <a href="{{ route('about') }}" class="block text-gray-300 hover:text-amber-500 font-medium py-2">Why Us</a>
+            <a href="{{ route('products') }}" class="block text-gray-300 hover:text-amber-500 font-medium py-2">Products</a>
+            <a href="{{ route('packages') }}" class="block text-gray-300 hover:text-amber-500 font-medium py-2">Packages</a>
+            <a href="{{ route('contact') }}" class="block text-gray-300 hover:text-amber-500 font-medium py-2">Contact</a>
+            <div class="flex flex-col gap-3 pt-2">
+                <a href="{{ route('get.quote') }}" class="block bg-amber-500 text-white text-center px-5 py-3 rounded-lg font-bold">Get a Quote</a>
+                <a href="{{ route('admin.login') }}" class="block border border-white/20 text-white text-center px-5 py-3 rounded-lg font-bold">Admin Login</a>
+            </div>
         </div>
     </div>
 </nav>
@@ -66,56 +115,77 @@
 @endif
 @yield('content')
 <!-- Footer -->
-<footer class="bg-gray-900 text-white">
-    <div class="max-w-7xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-4 gap-10">
-        <div>
-            <div class="flex items-center space-x-3 mb-5">
-                <div class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-solar-panel text-white"></i>
+<footer class="bg-[#0b1222] border-t border-white/5 pt-24 pb-12">
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16">
+        <div class="space-y-8">
+            <a href="{{ route('home') }}" class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-sun text-white font-black"></i>
                 </div>
-                <span class="font-bold text-xl">SolarTech Solutions</span>
-            </div>
-            <p class="text-gray-400 text-sm leading-relaxed">Leading provider of solar energy solutions. We bring the power of the sun to your doorstep with quality products and expert installation.</p>
-            <div class="flex space-x-4 mt-5">
-                <a href="#" class="w-9 h-9 bg-gray-700 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors"><i class="fab fa-facebook-f text-sm"></i></a>
-                <a href="#" class="w-9 h-9 bg-gray-700 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors"><i class="fab fa-twitter text-sm"></i></a>
-                <a href="#" class="w-9 h-9 bg-gray-700 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors"><i class="fab fa-instagram text-sm"></i></a>
-                <a href="#" class="w-9 h-9 bg-gray-700 rounded-full flex items-center justify-center hover:bg-orange-500 transition-colors"><i class="fab fa-linkedin-in text-sm"></i></a>
-            </div>
-        </div>
-        <div>
-            <h4 class="font-bold text-lg mb-5">Quick Links</h4>
-            <ul class="space-y-3 text-gray-400 text-sm">
-                <li><a href="{{ route('home') }}" class="hover:text-orange-400 transition-colors">Home</a></li>
-                <li><a href="{{ route('about') }}" class="hover:text-orange-400 transition-colors">About Us</a></li>
-                <li><a href="{{ route('products') }}" class="hover:text-orange-400 transition-colors">Products</a></li>
-                <li><a href="{{ route('packages') }}" class="hover:text-orange-400 transition-colors">Packages</a></li>
-                <li><a href="{{ route('contact') }}" class="hover:text-orange-400 transition-colors">Contact Us</a></li>
-                <li><a href="{{ route('get.quote') }}" class="hover:text-orange-400 transition-colors">Get Free Quote</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4 class="font-bold text-lg mb-5">Product Categories</h4>
-            <ul class="space-y-3 text-gray-400 text-sm">
-                @foreach(\App\Models\ProductCategory::where('is_active',true)->orderBy('sort_order')->take(6)->get() as $cat)
-                <li><a href="{{ route('products.category', $cat->slug) }}" class="hover:text-orange-400 transition-colors flex items-center space-x-2"><i class="{{ $cat->icon ?? 'fas fa-solar-panel' }} text-xs mr-2"></i>{{ $cat->name }}</a></li>
+                <div>
+                    <span class="font-bold text-xl text-white tracking-tight">{{ explode(' ', $settings['company_name'] ?? 'SolarVolt Solutions')[0] }}</span>
+                    <span class="text-amber-500 font-bold text-xl tracking-tight">{{ explode(' ', $settings['company_name'] ?? 'SolarVolt Solutions')[1] ?? '' }}</span>
+                </div>
+            </a>
+            <p class="text-gray-500 font-inter leading-relaxed text-sm">
+                India's top-rated solar energy provider. Join thousands of satisfied homeowners and businesses who have saved millions on electricity bills while contributing to a greener planet.
+            </p>
+            <div class="flex gap-4">
+                @foreach(['facebook-f','twitter','instagram','linkedin-in'] as $icon)
+                <a href="#" class="w-10 h-10 glass rounded-xl flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all text-gray-500">
+                    <i class="fab fa-{{ $icon }} text-sm"></i>
+                </a>
                 @endforeach
-            </ul>
+            </div>
         </div>
+
         <div>
-            <h4 class="font-bold text-lg mb-5">Contact Info</h4>
-            <ul class="space-y-4 text-gray-400 text-sm">
-                <li class="flex items-start space-x-3"><i class="fas fa-map-marker-alt text-orange-500 mt-1"></i><span>123 Solar Park, Green City, Gujarat - 380001</span></li>
-                <li class="flex items-center space-x-3"><i class="fas fa-phone text-orange-500"></i><span>+91 98765 43210</span></li>
-                <li class="flex items-center space-x-3"><i class="fas fa-envelope text-orange-500"></i><span>info@solartech.com</span></li>
-                <li class="flex items-center space-x-3"><i class="fas fa-clock text-orange-500"></i><span>Mon–Sat: 9:00 AM – 6:00 PM</span></li>
-            </ul>
+            <h4 class="text-white font-black text-xs uppercase tracking-[0.2em] mb-10">Quick Links</h4>
+            <div class="grid grid-cols-1 gap-4">
+                @foreach([['Home', 'home'],['Why Us', 'about'],['Hardware', 'products'],['Packages', 'packages'],['Contact', 'contact']] as $link)
+                <a href="{{ route($link[1]) }}" class="text-gray-500 hover:text-amber-500 transition-colors text-sm font-bold font-inter">{{ $link[0] }}</a>
+                @endforeach
+            </div>
+        </div>
+
+        <div>
+            <h4 class="text-white font-black text-xs uppercase tracking-[0.2em] mb-10">Hardware</h4>
+            <div class="grid grid-cols-1 gap-4">
+                @foreach(\App\Models\ProductCategory::where('is_active',true)->orderBy('sort_order')->take(5)->get() as $cat)
+                <a href="{{ route('products.category', $cat->slug) }}" class="text-gray-500 hover:text-amber-500 transition-colors text-sm font-bold font-inter">{{ $cat->name }}</a>
+                @endforeach
+            </div>
+        </div>
+
+        <div>
+            <h4 class="text-white font-black text-xs uppercase tracking-[0.2em] mb-10">Contact Support</h4>
+            <div class="space-y-6">
+                <div class="flex items-start gap-4">
+                    <i class="fas fa-map-marker-alt text-amber-500 mt-1"></i>
+                    <p class="text-gray-500 text-sm font-bold font-inter">{{ $settings['company_address'] ?? '123 Solar Park, Gujarat' }}</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <i class="fas fa-phone-alt text-amber-500"></i>
+                    <p class="text-gray-500 text-sm font-bold font-inter">{{ $settings['company_phone'] ?? '+91 98765 43210' }}</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <i class="fas fa-envelope text-amber-500"></i>
+                    <p class="text-gray-500 text-sm font-bold font-inter">{{ $settings['company_email'] ?? 'info@solarvolt.com' }}</p>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="border-t border-gray-700 py-6 text-center text-sm text-gray-500">
-        <p>© {{ date('Y') }} SolarTech Solutions. All rights reserved.</p>
-        <p class="mt-1">Made with ❤️ by <a href="https://laracopilot.com/" target="_blank" class="text-orange-400 hover:underline">LaraCopilot</a></p>
+    
+    <div class="max-w-7xl mx-auto px-4 mt-24 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+        <p class="text-gray-600 text-[10px] uppercase font-black tracking-widest leading-loose text-center md:text-left">
+            © {{ date('Y') }} {{ $settings['company_name'] ?? 'SolarVolt Solutions' }}. Built with ❤️ by <a href="https://laracopilot.com/" target="_blank" class="text-amber-500 hover:underline">LaraCopilot</a>.
+        </p>
+        <div class="flex gap-8 text-[10px] uppercase font-black tracking-widest text-gray-600">
+            <a href="#" class="hover:text-amber-500 transition-colors">Privacy Policy</a>
+            <a href="#" class="hover:text-amber-500 transition-colors">Terms of Service</a>
+        </div>
     </div>
 </footer>
+
 </body>
 </html>

@@ -3,78 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solar ERP - Admin Login</title>
+    <title>{{ \App\Models\Setting::where('key', 'company_name')->first()->value ?? 'Palawat Solar' }} - Admin Gateway</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        .font-inter { font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px border rgba(255, 255, 255, 0.05); }
+        .login-bg { background-color: #0f172a; background-image: radial-gradient(circle at 0% 0%, rgba(245, 158, 11, 0.05) 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(245, 158, 11, 0.05) 0%, transparent 50%); }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        .float { animation: float 4s ease-in-out infinite; }
+    </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-orange-500 via-orange-600 to-amber-700 flex items-center justify-center p-4">
-    <div class="w-full max-w-md">
-        <div class="text-center mb-8">
-            <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <i class="fas fa-solar-panel text-4xl text-orange-600"></i>
+<body class="min-h-screen login-bg flex items-center justify-center p-6 sm:p-12 relative overflow-hidden">
+    <!-- Decorative Elements -->
+    <div class="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-amber-500/5 rounded-full blur-[120px]"></div>
+    <div class="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] bg-amber-500/5 rounded-full blur-[120px]"></div>
+
+    <div class="w-full max-w-[450px] relative z-10">
+        <div class="text-center mb-12 fade-up">
+            <div class="w-20 h-20 bg-amber-500 rounded-[30px] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-amber-500/20 float">
+                <i class="fas fa-bolt text-3xl text-white"></i>
             </div>
-            <h1 class="text-3xl font-bold text-white">Solar ERP</h1>
-            <p class="text-orange-100 mt-1">Enterprise Resource Planning</p>
+            <h1 class="text-4xl font-black text-white tracking-tighter mb-2">Admin Portal</h1>
+            <p class="text-gray-500 font-inter font-medium uppercase tracking-[0.2em] text-[10px]">Secure Enterprise Access</p>
         </div>
-        <div class="bg-white rounded-2xl shadow-2xl p-8">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Admin Login</h2>
+
+        <div class="glass p-12 rounded-[50px] border border-white/5 relative group">
+            <div class="absolute -inset-px bg-gradient-to-br from-amber-500/20 to-transparent rounded-[50px] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+            
+            <h2 class="text-2xl font-bold text-white mb-8 tracking-tight">Identity Verification</h2>
+            
             @if($errors->any())
-            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-                <p class="text-sm"><i class="fas fa-exclamation-circle mr-1"></i>{{ $errors->first() }}</p>
+            <div class="bg-red-500/10 border border-red-500/20 text-red-400 px-5 py-3 rounded-2xl mb-8 text-sm flex items-center gap-3">
+                <i class="fas fa-shield-alt opacity-50"></i>
+                <p>{{ $errors->first() }}</p>
             </div>
             @endif
-            <form action="{{ route('admin.login.post') }}" method="POST" class="space-y-5">
+
+            <form action="{{ route('admin.login.post') }}" method="POST" class="space-y-8">
                 @csrf
-                <div>
-                    <label class="block text-gray-700 font-medium mb-2 text-sm">Email Address</label>
+                <div class="group">
+                    <label class="block text-[10px] uppercase font-black tracking-widest text-gray-500 mb-3 group-focus-within:text-amber-500 transition-colors">Credential Identifier</label>
                     <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                            <i class="fas fa-envelope"></i>
+                        <span class="absolute inset-y-0 left-0 pl-6 flex items-center text-gray-600 transition-colors group-focus-within:text-amber-500">
+                            <i class="fas fa-at"></i>
                         </span>
-                        <input type="email" name="email" value="{{ old('email', 'admin@solarerp.com') }}" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" required>
+                        <input type="email" name="email" value="{{ old('email', 'admin@solarerp.com') }}" class="w-full bg-white/5 border border-white/5 rounded-2xl pl-16 pr-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:bg-white/10 transition-all font-inter" required placeholder="email@address.com">
                     </div>
                 </div>
-                <div>
-                    <label class="block text-gray-700 font-medium mb-2 text-sm">Password</label>
+
+                <div class="group">
+                    <label class="block text-[10px] uppercase font-black tracking-widest text-gray-500 mb-3 group-focus-within:text-amber-500 transition-colors">Secret Phrase</label>
                     <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                            <i class="fas fa-lock"></i>
+                        <span class="absolute inset-y-0 left-0 pl-6 flex items-center text-gray-600 transition-colors group-focus-within:text-amber-500">
+                            <i class="fas fa-key"></i>
                         </span>
-                        <input type="password" id="password" name="password" value="admin123" class="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" required>
-                        <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
-                            <i id="toggleIcon" class="fas fa-eye"></i>
+                        <input type="password" id="password" name="password" value="admin123" class="w-full bg-white/5 border border-white/5 rounded-2xl pl-16 pr-14 py-4 text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:bg-white/10 transition-all font-inter" required placeholder="••••••••">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-6 flex items-center text-gray-600 hover:text-white transition-colors">
+                            <i id="toggleIcon" class="fas fa-eye-low-vision"></i>
                         </button>
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-md">
-                    <i class="fas fa-sign-in-alt mr-2"></i>Sign In
-                </button>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-5 rounded-[24px] font-black text-xl transition-all shadow-2xl shadow-amber-500/20 hover:-translate-y-1 active:translate-y-0">
+                        Authenticate Access <i class="fas fa-signature ml-3 text-sm opacity-50"></i>
+                    </button>
+                </div>
             </form>
-            <div class="mt-6 p-4 bg-orange-50 rounded-lg border border-orange-200">
-                <p class="text-xs font-semibold text-orange-800 mb-2"><i class="fas fa-key mr-1"></i>Demo Credentials:</p>
-                <div class="space-y-1 text-xs text-gray-600">
-                    <p><span class="font-medium">Admin:</span> admin@solarerp.com / admin123</p>
-                    <p><span class="font-medium">Sales:</span> sales@solarerp.com / sales123</p>
-                    <p><span class="font-medium">Tech:</span> tech@solarerp.com / tech123</p>
+
+            <!-- Quick Access Debug -->
+            <div class="mt-12 pt-8 border-t border-white/5 text-center">
+                <p class="text-[10px] text-gray-600 uppercase font-black tracking-widest mb-4">Standard Credentials</p>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <span class="bg-white/5 px-3 py-1 rounded-full text-[10px] text-gray-400 font-inter">admin@solarerp.com</span>
+                    <span class="bg-white/5 px-3 py-1 rounded-full text-[10px] text-gray-400 font-inter">admin123</span>
                 </div>
             </div>
         </div>
-        <p class="text-center text-orange-100 text-sm mt-4">
-            <a href="{{ route('home') }}" class="hover:text-white"><i class="fas fa-arrow-left mr-1"></i>Back to Website</a>
+
+        <p class="text-center mt-10">
+            <a href="{{ route('home') }}" class="text-gray-600 hover:text-amber-500 transition-colors text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2">
+                <i class="fas fa-chevron-left text-[8px]"></i> Return to Public Site
+            </a>
         </p>
     </div>
+
     <script>
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
             const toggleIcon = document.getElementById('toggleIcon');
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
+                toggleIcon.classList.remove('fa-eye-low-vision');
+                toggleIcon.classList.add('fa-eye');
             } else {
                 passwordInput.type = 'password';
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-low-vision');
             }
         }
     </script>

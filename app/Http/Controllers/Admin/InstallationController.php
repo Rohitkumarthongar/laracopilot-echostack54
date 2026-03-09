@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\SalesOrder;
 use App\Models\ServiceRequest;
 use App\Models\Notification;
+use App\Models\Team;
 use App\Services\SmsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -33,7 +34,8 @@ class InstallationController extends Controller
         if (!session('admin_logged_in')) return redirect()->route('admin.login');
         $customers   = Customer::orderBy('name')->get();
         $salesOrders = SalesOrder::where('status', 'confirmed')->orWhere('status', 'processing')->get();
-        return view('admin.installations.create', compact('customers', 'salesOrders'));
+        $teams       = Team::where('status', 'active')->get();
+        return view('admin.installations.create', compact('customers', 'salesOrders', 'teams'));
     }
 
     public function store(Request $request)
@@ -89,7 +91,8 @@ class InstallationController extends Controller
         $installation = Installation::findOrFail($id);
         $customers    = Customer::orderBy('name')->get();
         $salesOrders  = SalesOrder::all();
-        return view('admin.installations.edit', compact('installation', 'customers', 'salesOrders'));
+        $teams        = Team::where('status', 'active')->get();
+        return view('admin.installations.edit', compact('installation', 'customers', 'salesOrders', 'teams'));
     }
 
     public function update(Request $request, $id)

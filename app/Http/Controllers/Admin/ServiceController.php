@@ -7,6 +7,7 @@ use App\Models\ServiceRequest;
 use App\Models\Customer;
 use App\Models\Installation;
 use App\Models\Notification;
+use App\Models\Team;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
@@ -23,7 +24,8 @@ class ServiceController extends Controller
         if (!session('admin_logged_in')) return redirect()->route('admin.login');
         $customers = Customer::orderBy('name')->get();
         $installations = Installation::where('status', 'completed')->with('customer')->get();
-        return view('admin.services.create', compact('customers', 'installations'));
+        $teams = Team::where('status', 'active')->get();
+        return view('admin.services.create', compact('customers', 'installations', 'teams'));
     }
 
     public function store(Request $request)
@@ -64,7 +66,8 @@ class ServiceController extends Controller
         $service = ServiceRequest::findOrFail($id);
         $customers = Customer::orderBy('name')->get();
         $installations = Installation::where('status', 'completed')->get();
-        return view('admin.services.edit', compact('service', 'customers', 'installations'));
+        $teams = Team::where('status', 'active')->get();
+        return view('admin.services.edit', compact('service', 'customers', 'installations', 'teams'));
     }
 
     public function update(Request $request, $id)

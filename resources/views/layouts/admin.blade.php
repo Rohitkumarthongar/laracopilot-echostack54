@@ -3,13 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Solar ERP') - SolarTech Solutions</title>
+    <title>@yield('title', 'Solar ERP') - {{ \App\Models\Setting::where('key','company_name')->value('value') ?? 'SolarTech Solutions' }}</title>
+    @php $settings = \App\Models\Setting::pluck('value', 'key')->toArray(); @endphp
+    @if(!empty($settings['company_favicon']))
+        <link rel="icon" type="image/png" href="{{ asset('storage/' . $settings['company_favicon']) }}">
+    @endif
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        .sidebar { transition: all 0.3s ease; }
+        .sidebar { transition: transform 0.3s ease-in-out; }
+        @media (max-width: 1024px) {
+            .sidebar { position: fixed; z-index: 50; height: 100vh; transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+        }
         .nav-item:hover { background: rgba(255,255,255,0.1); }
         .nav-item.active { background: rgba(255,255,255,0.2); border-left: 3px solid #F59E0B; }
+        
+        /* Remove horizontal scrollbar */
+        * { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.1) transparent; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+        .overflow-x-auto { scrollbar-width: none; -ms-overflow-style: none; }
+        .overflow-x-auto::-webkit-scrollbar { display: none; }
+
         @keyframes slideIn { from { transform: translateX(-10px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .animate-slide { animation: slideIn 0.3s ease; }
     </style>
@@ -20,12 +38,18 @@
     <div class="sidebar bg-gradient-to-b from-orange-600 to-orange-800 text-white w-64 flex-shrink-0 overflow-y-auto" id="sidebar">
         <div class="p-4 border-b border-orange-500">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center">
-                    <i class="fas fa-solar-panel text-orange-800 text-lg"></i>
-                </div>
-                <div>
-                    <p class="font-bold text-sm leading-tight">Solar ERP</p>
-                    <p class="text-orange-200 text-xs">Management System</p>
+                @if(!empty($settings['company_logo']))
+                    <div class="w-10 h-10 bg-white rounded-lg p-1.5 flex items-center justify-center">
+                        <img src="{{ asset('storage/' . $settings['company_logo']) }}" class="max-h-full max-w-full">
+                    </div>
+                @else
+                    <div class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-solar-panel text-orange-800 text-lg"></i>
+                    </div>
+                @endif
+                <div class="overflow-hidden">
+                    <p class="font-bold text-sm leading-tight truncate">{{ $settings['company_name'] ?? 'Solar ERP' }}</p>
+                    <p class="text-orange-200 text-[10px] leading-tight mt-0.5 truncate">{{ $settings['company_tagline'] ?? 'Management System' }}</p>
                 </div>
             </div>
         </div>
@@ -85,6 +109,9 @@
             <a href="{{ route('admin.employees.index') }}" class="nav-item flex items-center space-x-3 p-3 rounded-lg text-sm {{ request()->routeIs('admin.employees*') ? 'active' : '' }}">
                 <i class="fas fa-user-tie w-5"></i><span>Employees</span>
             </a>
+            <a href="{{ route('admin.teams.index') }}" class="nav-item flex items-center space-x-3 p-3 rounded-lg text-sm {{ request()->routeIs('admin.teams*') ? 'active' : '' }}">
+                <i class="fas fa-users-cog w-5"></i><span>Teams</span>
+            </a>
             <a href="{{ route('admin.reports.index') }}" class="nav-item flex items-center space-x-3 p-3 rounded-lg text-sm {{ request()->routeIs('admin.reports*') ? 'active' : '' }}">
                 <i class="fas fa-chart-bar w-5"></i><span>Reports</span>
             </a>
@@ -114,7 +141,7 @@
     <div class="flex-1 flex flex-col overflow-hidden">
         <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-4">
-                <button onclick="document.getElementById('sidebar').classList.toggle('hidden')" class="text-gray-500 hover:text-gray-700">
+                <button onclick="toggleSidebar()" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
                 <h1 class="text-lg font-semibold text-gray-800">@yield('page-title', 'Dashboard')</h1>
@@ -137,18 +164,7 @@
             </div>
         </header>
         <div class="px-6 pt-4">
-            @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-lg mb-4 flex items-center justify-between animate-slide">
-                <span><i class="fas fa-check-circle mr-2"></i>{{ session('success') }}</span>
-                <button onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
-            </div>
-            @endif
-            @if(session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded-lg mb-4 flex items-center justify-between">
-                <span><i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}</span>
-                <button onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
-            </div>
-            @endif
+            {{-- SweetAlert handles notifications now --}}
         </div>
         <main class="flex-1 overflow-y-auto p-6">
             @yield('content')
@@ -156,6 +172,87 @@
     </div>
 </div>
 <script>
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('active');
+    }
+
+    // Gesture / Swipe Operations
+    let touchstartX = 0;
+    let touchendX = 0;
+    
+    document.addEventListener('touchstart', e => {
+        touchstartX = e.changedTouches[0].screenX;
+    }, false);
+
+    document.addEventListener('touchend', e => {
+        touchendX = e.changedTouches[0].screenX;
+        handleGesture();
+    }, false);
+
+    function handleGesture() {
+        const sidebar = document.getElementById('sidebar');
+        // Swipe Right to Open
+        if (touchendX - touchstartX > 100 && touchstartX < 50) {
+            sidebar.classList.add('active');
+        }
+        // Swipe Left to Close
+        if (touchstartX - touchendX > 70 && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+        }
+    }
+
+    // SweetAlert handling for flash messages
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: "{{ session('success') }}",
+            timer: 3500,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end',
+            timerProgressBar: true
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Hold on...',
+            text: "{{ session('error') }}",
+            confirmButtonColor: '#F59E0B'
+        });
+    @endif
+
+    // Global delete confirmation
+    function confirmDelete(title = 'Are you sure?', text = 'This action cannot be undone!') {
+        return Swal.fire({
+            title: title,
+            text: text,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            cancelButtonColor: '#f3f4f6',
+            cancelButtonText: '<span style="color: #4b5563">Cancel</span>',
+            confirmButtonText: 'Yes, proceed!',
+            background: '#fff',
+            borderRadius: '20px'
+        });
+    }
+
+    // Attach to forms with .delete-form class
+    document.addEventListener('submit', function(e) {
+        if (e.target.classList.contains('delete-form')) {
+            e.preventDefault();
+            confirmDelete(e.target.dataset.title || 'Are you sure?', e.target.dataset.text || 'This action will remove the record forever.')
+            .then((result) => {
+                if (result.isConfirmed) {
+                    e.target.submit();
+                }
+            });
+        }
+    });
+
     setTimeout(() => {
         document.querySelectorAll('.animate-slide').forEach(el => {
             el.style.opacity = '0'; el.style.transition = 'opacity 0.5s';
@@ -165,3 +262,9 @@
 </script>
 </body>
 </html>
+<!-- Extra script for UI fixes -->
+<style>
+    /* Ensure no horizontal scroll */
+    body { overflow-x: hidden; }
+    main { overflow-x: hidden; }
+</style>

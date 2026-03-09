@@ -273,7 +273,7 @@
 
 <script>
     // Products data for item rows
-    const products = @json($products->map(fn($p) => ['id' => $p->id, 'name' => $p->name, 'price' => (float)$p->selling_price]));
+    const products = {!! json_encode($products->map(fn($p) => ['id' => $p->id, 'name' => $p->name, 'price' => (float)$p->selling_price])->values()->all()) !!};
 
     let itemIndex = 0;
 

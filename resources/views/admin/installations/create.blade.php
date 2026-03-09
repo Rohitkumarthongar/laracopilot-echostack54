@@ -116,9 +116,15 @@
                         </div>
                         
                         <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Assigned Team</label>
-                            <input type="text" name="assigned_team" value="{{ old('assigned_team') }}" placeholder="e.g. Alpha Team, John Doe"
-                                class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase">Assigned Service Team</label>
+                            <select name="assigned_team"
+                                class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 font-bold bg-indigo-50/30">
+                                <option value="">— Unassigned / TBD —</option>
+                                @foreach($teams as $team)
+                                    <option value="{{ $team->name }}" {{ old('assigned_team') == $team->name ? 'selected' : '' }}>{{ $team->name }}</option>
+                                @endforeach
+                            </select>
+                            <p class="text-[10px] text-gray-400 mt-1 italic font-medium">Create more teams in <a href="{{ route('admin.teams.index') }}" class="text-indigo-600 hover:underline">Team Management</a></p>
                         </div>
                     </div>
                 </div>

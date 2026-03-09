@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\PrintFormatController;
+use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\WebController;
 
 // ── Public Website ────────────────────────────────────────────────────────────
@@ -212,3 +213,10 @@ Route::get('/admin/reports/inventory', [ReportController::class, 'inventory'])->
 Route::get('/admin/reports/sales/pdf', [ReportController::class, 'salesPdf'])->name('admin.reports.sales.pdf');
 Route::get('/admin/reports/purchase/pdf', [ReportController::class, 'purchasePdf'])->name('admin.reports.purchase.pdf');
 Route::get('/admin/reports/salary/pdf', [ReportController::class, 'salaryPdf'])->name('admin.reports.salary.pdf');
+// ── Teams ─────────────────────────────────────────────────────────────────────
+Route::get('/admin/teams', [TeamController::class, 'index'])->name('admin.teams.index');
+Route::get('/admin/teams/create', [TeamController::class, 'create'])->name('admin.teams.create');
+Route::post('/admin/teams', [TeamController::class, 'store'])->name('admin.teams.store');
+Route::get('/admin/teams/{id}/edit', [TeamController::class, 'edit'])->name('admin.teams.edit');
+Route::put('/admin/teams/{id}', [TeamController::class, 'update'])->name('admin.teams.update');
+Route::delete('/admin/teams/{id}', [TeamController::class, 'destroy'])->name('admin.teams.destroy');

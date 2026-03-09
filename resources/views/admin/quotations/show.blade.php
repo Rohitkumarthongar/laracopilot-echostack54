@@ -1,0 +1,220 @@
+@extends('layouts.admin')
+@section('title', 'Quotation — ' . $quotation->quotation_number)
+@section('page-title', 'Quotations')
+@section('content')
+<div class="space-y-6">
+
+    {{-- Breadcrumb / Back --}}
+    <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.quotations.index') }}"
+                class="w-9 h-9 flex items-center justify-center rounded-xl bg-white shadow-sm hover:bg-gray-50 text-gray-600 transition">
+                <i class="fas fa-arrow-left text-sm"></i>
+            </a>
+            <div>
+                <h2 class="text-xl font-bold text-gray-800">{{ $quotation->quotation_number }}</h2>
+                <p class="text-sm text-gray-500">Created {{ $quotation->created_at->format('d M Y, h:i A') }}</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('admin.quotations.pdf', $quotation->id) }}"
+                class="inline-flex items-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium px-4 py-2 rounded-xl transition shadow-sm">
+                <i class="fas fa-file-pdf text-red-500"></i> Download PDF
+            </a>
+            <a href="{{ route('admin.quotations.edit', $quotation->id) }}"
+                class="inline-flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-xl transition shadow-sm">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            @if($quotation->status !== 'approved')
+                <form action="{{ route('admin.quotations.convert-to-order', $quotation->id) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition shadow-sm">
+                        <i class="fas fa-check-circle"></i> Convert to Order
+                    </button>
+                </form>
+            @endif
+        </div>
+    </div>
+
+    {{-- Flash Messages --}}
+    @if(session('success'))
+    <div class="bg-green-50 border border-green-200 text-green-700 rounded-xl px-5 py-3 flex items-center gap-3">
+        <i class="fas fa-check-circle text-green-500"></i> {{ session('success') }}
+    </div>
+    @endif
+    @if(session('error'))
+    <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl px-5 py-3 flex items-center gap-3">
+        <i class="fas fa-exclamation-triangle text-red-500"></i> {{ session('error') }}
+    </div>
+    @endif
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+        {{-- LEFT: Items + Notes --}}
+        <div class="xl:col-span-2 space-y-6">
+
+            {{-- Quotation Items --}}
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
+                    <i class="fas fa-list text-indigo-500"></i>
+                    <h3 class="font-bold text-gray-800">Quotation Items</h3>
+                    <span class="ml-auto text-xs text-gray-400">{{ $quotation->items->count() }} item(s)</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                            <tr>
+                                <th class="text-left px-6 py-3">Description</th>
+                                <th class="text-center px-4 py-3">Qty</th>
+                                <th class="text-right px-4 py-3">Unit Price</th>
+                                <th class="text-right px-6 py-3">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @foreach($quotation->items as $item)
+                            <tr>
+                                <td class="px-6 py-3 text-gray-700">{{ $item->description }}</td>
+                                <td class="px-4 py-3 text-center text-gray-600">{{ $item->quantity }}</td>
+                                <td class="px-4 py-3 text-right text-gray-600">₹{{ number_format($item->unit_price, 2) }}</td>
+                                <td class="px-6 py-3 text-right font-semibold text-gray-800">₹{{ number_format($item->total_price, 2) }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot class="bg-gray-50 border-t border-gray-100 text-sm">
+                            <tr>
+                                <td colspan="3" class="px-6 py-2.5 text-right text-gray-500 font-medium">Subtotal</td>
+                                <td class="px-6 py-2.5 text-right font-semibold text-gray-700">₹{{ number_format($quotation->total_amount, 2) }}</td>
+                            </tr>
+                            @if($quotation->tax_amount > 0)
+                            <tr>
+                                <td colspan="3" class="px-6 py-2.5 text-right text-gray-500 font-medium">Tax</td>
+                                <td class="px-6 py-2.5 text-right text-gray-600">+₹{{ number_format($quotation->tax_amount, 2) }}</td>
+                            </tr>
+                            @endif
+                            @if($quotation->discount_amount > 0)
+                            <tr>
+                                <td colspan="3" class="px-6 py-2.5 text-right text-gray-500 font-medium">Discount</td>
+                                <td class="px-6 py-2.5 text-right text-green-600">-₹{{ number_format($quotation->discount_amount, 2) }}</td>
+                            </tr>
+                            @endif
+                            <tr class="border-t border-gray-200">
+                                <td colspan="3" class="px-6 py-3 text-right font-bold text-gray-800">Grand Total</td>
+                                <td class="px-6 py-3 text-right font-bold text-indigo-600 text-base">₹{{ number_format($quotation->final_amount, 2) }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            {{-- Notes --}}
+            @if($quotation->notes)
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+                <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <i class="fas fa-sticky-note text-indigo-500"></i> Notes
+                </h3>
+                <p class="text-sm text-gray-600 leading-relaxed">{{ $quotation->notes }}</p>
+            </div>
+            @endif
+        </div>
+
+        {{-- RIGHT: Details pane --}}
+        <div class="space-y-5">
+
+            {{-- Status Card --}}
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-info-circle text-indigo-500"></i> Quotation Details
+                </h3>
+                <div class="space-y-3 text-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-500">Status</span>
+                        @php
+                            $statusColors = [
+                                'pending'  => 'bg-yellow-100 text-yellow-700',
+                                'sent' => 'bg-blue-100 text-blue-700',
+                                'approved' => 'bg-green-100 text-green-700',
+                                'rejected'  => 'bg-red-100 text-red-700',
+                                'expired'  => 'bg-gray-200 text-gray-600',
+                            ];
+                        @endphp
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold {{ $statusColors[$quotation->status] ?? 'bg-gray-100 text-gray-600' }}">
+                            {{ ucfirst($quotation->status) }}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-500">Valid Until</span>
+                        <span class="font-medium text-gray-800">{{ \Carbon\Carbon::parse($quotation->valid_until)->format('d M Y') }}</span>
+                    </div>
+                    @if($quotation->lead)
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-500">Generated from Lead</span>
+                        <a href="{{ route('admin.leads.show', $quotation->lead->id) }}"
+                            class="text-indigo-600 hover:underline text-xs font-medium">
+                            {{ $quotation->lead->lead_number }}
+                        </a>
+                    </div>
+                    @endif
+                    @if($quotation->sent_at)
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-500">Sent to Customer</span>
+                        <span class="text-green-600 font-medium text-xs">{{ \Carbon\Carbon::parse($quotation->sent_at)->format('d M y, h:i A') }}</span>
+                    </div>
+                    @endif
+                </div>
+
+                @if($quotation->status !== 'approved')
+                    <form action="{{ route('admin.quotations.send-email', $quotation->id) }}" method="POST" class="mt-4 pt-4 border-t border-gray-100">
+                        @csrf
+                        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium text-sm py-2 rounded-xl transition">
+                            <i class="fas fa-paper-plane"></i> Email This Quotation
+                        </button>
+                    </form>
+                @endif
+            </div>
+
+            {{-- Customer Card --}}
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-user text-indigo-500"></i> Customer Info
+                </h3>
+                <div class="space-y-2 text-sm">
+                    <p class="font-semibold text-gray-800">
+                        @if($quotation->customer)
+                            <a href="{{ route('admin.customers.show', $quotation->customer->id) }}" class="hover:text-indigo-600">{{ $quotation->customer_name }}</a>
+                        @else
+                            {{ $quotation->customer_name }}
+                        @endif
+                    </p>
+                    <p class="text-gray-500 flex items-center gap-2">
+                        <i class="fas fa-envelope w-4 text-gray-400"></i> <a href="mailto:{{ $quotation->customer_email }}" class="hover:text-indigo-500 hover:underline">{{ $quotation->customer_email }}</a>
+                    </p>
+                    <p class="text-gray-500 flex items-center gap-2">
+                        <i class="fas fa-phone w-4 text-gray-400"></i> <a href="tel:{{ $quotation->customer_phone }}" class="hover:text-indigo-500 hover:underline">{{ $quotation->customer_phone }}</a>
+                    </p>
+                    <p class="text-gray-500 flex items-start gap-2">
+                        <i class="fas fa-map-marker-alt w-4 text-gray-400 mt-0.5"></i>
+                        <span>{{ $quotation->customer_address }}</span>
+                    </p>
+                </div>
+            </div>
+
+            {{-- Danger Zone --}}
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+                <h3 class="font-bold text-red-600 mb-3 flex items-center gap-2">
+                    <i class="fas fa-exclamation-triangle"></i> Danger Zone
+                </h3>
+                <form action="{{ route('admin.quotations.destroy', $quotation->id) }}" method="POST"
+                    onsubmit="return confirm('Permanently delete this quotation?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit"
+                        class="w-full inline-flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 font-medium text-sm py-2.5 rounded-xl transition">
+                        <i class="fas fa-trash"></i> Delete Quotation
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+@endsection

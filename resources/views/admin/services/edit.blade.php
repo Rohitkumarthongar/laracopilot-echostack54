@@ -70,9 +70,14 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1.5">Assigned To</label>
-                                <input type="text" name="assigned_to" value="{{ old('assigned_to', $service->assigned_to) }}"
-                                    class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
+                                <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase italic">Assigned Crew</label>
+                                <select name="assigned_to"
+                                    class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 font-bold bg-orange-50/10">
+                                    <option value="">— Unassigned —</option>
+                                    @foreach($teams as $team)
+                                        <option value="{{ $team->name }}" {{ old('assigned_to', $service->assigned_to) == $team->name ? 'selected' : '' }}>{{ $team->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                     </div>

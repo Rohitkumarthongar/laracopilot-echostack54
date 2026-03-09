@@ -1,77 +1,58 @@
 @extends('layouts.web')
 @section('title', 'Thank You!')
 @section('content')
-<section class="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center py-20">
-    <div class="max-w-3xl mx-auto px-4 text-center">
+<section class="min-h-screen bg-[#0f172a] flex items-center py-32 relative overflow-hidden">
+    <!-- Background Decor -->
+    <div class="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-amber-500/10 to-transparent"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-amber-500/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+    <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
         <!-- Success Animation -->
-        <div class="w-28 h-28 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl" style="animation: bounce 1s infinite alternate">
-            <i class="fas fa-check text-white text-5xl"></i>
+        <div class="w-32 h-32 bg-amber-500 rounded-[40px] flex items-center justify-center mx-auto mb-12 shadow-2xl shadow-amber-500/40 relative group" style="animation: float 3s ease-in-out infinite">
+            <i class="fas fa-check text-white text-6xl"></i>
+            <div class="absolute inset-0 rounded-[40px] bg-amber-500 pulse"></div>
         </div>
-        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            {{ $type === 'quote' ? '🎉 Quote Request Received!' : '✅ Message Sent!' }}
+        
+        <h1 class="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight">
+            {{ $type === 'quote' ? 'Success!' : 'Received!' }}
         </h1>
-        <p class="text-xl text-gray-600 mb-6">
+        <p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto font-inter leading-relaxed">
             {{ $type === 'quote'
-                ? 'Thank you for your solar quote request! Our expert team will review your requirements and contact you within 24 hours.'
-                : 'Thank you for reaching out! Our team will get back to you shortly.' }}
+                ? 'Your custom solar quote request is in our expert queue. We\'ll analyze your property and contact you with a detailed savings plan shortly.'
+                : 'Thank you for reaching out to us. Our dedicated solar team will review your message and get back to you within 24 hours.' }}
         </p>
 
-        <!-- Info Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-orange-100">
-                <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-phone text-blue-500 text-xl"></i>
+        <!-- Info Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+            @foreach([
+                ['icon' => 'fas fa-phone-alt', 'title' => 'Call Back', 'desc' => 'Within 24 hours'],
+                ['icon' => 'fas fa-envelope-open-text', 'title' => 'Email', 'desc' => 'Confirmation sent'],
+                ['icon' => 'fas fa-shield-alt', 'title' => 'Service', 'desc' => 'Priority support']
+            ] as $card)
+            <div class="glass p-8 rounded-3xl border border-white/5">
+                <div class="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-500/20">
+                    <i class="{{ $card['icon'] }} text-amber-500 text-xl"></i>
                 </div>
-                <p class="font-bold text-gray-800">Call Back</p>
-                <p class="text-gray-500 text-sm mt-1">Our expert will call you within 24 hours</p>
+                <h4 class="font-bold text-white mb-1">{{ $card['title'] }}</h4>
+                <p class="text-gray-500 text-xs uppercase font-black tracking-widest">{{ $card['desc'] }}</p>
             </div>
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-orange-100">
-                <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-envelope text-green-500 text-xl"></i>
-                </div>
-                <p class="font-bold text-gray-800">Email Confirmation</p>
-                <p class="text-gray-500 text-sm mt-1">Check your inbox for confirmation details</p>
-            </div>
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-orange-100">
-                <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-sms text-purple-500 text-xl"></i>
-                </div>
-                <p class="font-bold text-gray-800">SMS Update</p>
-                <p class="text-gray-500 text-sm mt-1">You'll receive an SMS acknowledgement</p>
-            </div>
+            @endforeach
         </div>
 
-        @if($type === 'quote')
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-green-200 mb-8 text-left">
-            <h3 class="font-bold text-green-700 mb-3"><i class="fas fa-list-check mr-2"></i>What Happens Next?</h3>
-            <ul class="space-y-3">
-                @foreach(['Our solar expert will call you within 24 hours','We conduct a free site assessment at your location','You receive a detailed, customised solar quotation','Our certified team handles professional installation','24/7 after-sales support & AMC services'] as $i => $step)
-                <li class="flex items-start space-x-3">
-                    <span class="w-7 h-7 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">{{ $i + 1 }}</span>
-                    <span class="text-gray-600 pt-0.5">{{ $step }}</span>
-                </li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
-
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="{{ route('home') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-full font-bold transition-colors">
-                <i class="fas fa-home mr-2"></i>Back to Home
+        <div class="flex flex-col sm:flex-row gap-6 justify-center pt-8 border-t border-white/5">
+            <a href="{{ route('home') }}" class="bg-amber-500 hover:bg-amber-600 text-white px-12 py-5 rounded-2xl font-black text-xl transition-all shadow-2xl shadow-amber-500/20 hover:-translate-y-1">
+                Back to Home
             </a>
-            <a href="{{ route('packages') }}" class="border-2 border-orange-500 text-orange-600 hover:bg-orange-50 px-8 py-4 rounded-full font-bold transition-colors">
-                <i class="fas fa-solar-panel mr-2"></i>Explore Packages
+            <a href="{{ route('get.quote') }}" class="glass text-white px-12 py-5 rounded-2xl font-black text-xl hover:bg-white/10 transition-all border border-white/10">
+                New Quote
             </a>
-        </div>
-
-        <div class="mt-10 p-5 bg-orange-500 rounded-2xl text-white">
-            <p class="font-semibold">Need immediate assistance?</p>
-            <p class="text-2xl font-bold mt-1">+91 98765 43210</p>
-            <p class="text-orange-100 text-sm mt-1">Mon–Sat: 9:00 AM – 6:00 PM</p>
         </div>
     </div>
 </section>
+
 <style>
-  @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.08); } }
+    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } }
+    .pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0; transform: scale(1.5); } }
 </style>
 @endsection

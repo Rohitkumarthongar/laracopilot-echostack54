@@ -254,7 +254,7 @@
                 </h3>
                 <div class="space-y-3">
                     @foreach($installation->serviceRequests as $req)
-                    <a href="{{ route('admin.service-requests.show', $req->id) }}" class="block p-3 border border-gray-100 rounded-xl hover:bg-gray-50 hover:border-indigo-200 transition group">
+                    <a href="{{ route('admin.services.show', $req->id) }}" class="block p-3 border border-gray-100 rounded-xl hover:bg-gray-50 hover:border-indigo-200 transition group">
                         <div class="flex justify-between items-start mb-1">
                             <span class="text-xs font-bold text-indigo-600 group-hover:underline">{{ $req->ticket_number }}</span>
                             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase

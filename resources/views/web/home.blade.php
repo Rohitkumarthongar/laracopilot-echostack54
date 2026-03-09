@@ -1,122 +1,168 @@
 @extends('layouts.web')
-@section('title', $settings['company_name'] ?? 'SolarTech Solutions')
+@section('title', $settings['company_name'] ?? 'SolarVolt Solutions')
 @section('content')
 <!-- Hero -->
 <section class="hero-bg min-h-screen flex items-center relative overflow-hidden">
-    <div class="absolute inset-0 opacity-10">
-        <div class="absolute top-20 left-10 w-64 h-64 bg-white rounded-full blur-3xl"></div>
-        <div class="absolute bottom-20 right-10 w-96 h-96 bg-yellow-300 rounded-full blur-3xl"></div>
-    </div>
-    <div class="max-w-7xl mx-auto px-4 py-20 relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div class="text-white fade-up">
-                <span class="inline-block bg-white/20 text-white px-4 py-1 rounded-full text-sm font-medium mb-6">🌞 India's Trusted Solar Brand</span>
-                <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-6">{{ $settings['website_hero_title'] ?? 'Switch to Solar, Save More' }}</h1>
-                <p class="text-xl text-orange-100 mb-8 leading-relaxed">{{ $settings['website_hero_subtitle'] ?? 'Premium solar solutions for homes and businesses. Reduce your electricity bill by up to 90%.' }}</p>
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="{{ route('get.quote') }}" class="bg-white text-orange-600 px-8 py-4 rounded-full font-bold text-lg hover:shadow-xl transition-all inline-flex items-center justify-center"><i class="fas fa-calculator mr-2"></i>Get Free Quote</a>
-                    <a href="{{ route('products') }}" class="border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-orange-600 transition-all inline-flex items-center justify-center"><i class="fas fa-solar-panel mr-2"></i>Explore Products</a>
-                </div>
-                <div class="flex flex-wrap gap-8 mt-10">
-                    <div class="text-center"><p class="text-3xl font-bold">500+</p><p class="text-orange-100 text-sm">Installations</p></div>
-                    <div class="text-center"><p class="text-3xl font-bold">25yr</p><p class="text-orange-100 text-sm">Panel Warranty</p></div>
-                    <div class="text-center"><p class="text-3xl font-bold">90%</p><p class="text-orange-100 text-sm">Bill Reduction</p></div>
-                    <div class="text-center"><p class="text-3xl font-bold">24/7</p><p class="text-orange-100 text-sm">Support</p></div>
-                </div>
+    <div class="max-w-7xl mx-auto px-4 py-32 relative z-10 w-full">
+        <div class="max-w-3xl fade-up">
+            <span class="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-500 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-8">
+                <i class="fas fa-bolt"></i> Powering a Sustainable Future
+            </span>
+            <h1 class="text-6xl md:text-[5.5rem] font-black leading-[1] mb-8 text-white tracking-tighter">
+                Harness the <br> <span class="text-amber-500">Power</span> of the Sun
+            </h1>
+            <p class="text-lg md:text-xl text-gray-400 mb-12 leading-relaxed font-inter max-w-2xl">
+                Premium solar energy solutions for modern homes and businesses. Engineering a cleaner, brighter tomorrow with high-efficiency technology.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-6">
+                <a href="{{ route('get.quote') }}" class="relative inline-flex items-center justify-center px-12 py-5 overflow-hidden font-black text-white transition-all bg-amber-500 rounded-2xl group active:scale-95 shadow-2xl shadow-amber-500/30">
+                    <span class="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10"></span>
+                    <span class="relative">Calculate My Savings</span>
+                    <i class="fas fa-bolt ml-4 text-xs opacity-50"></i>
+                </a>
+                <a href="{{ route('products') }}" class="group inline-flex items-center justify-center px-12 py-5 font-black text-white glass hover:bg-white/10 rounded-2xl transition-all border border-white/10 active:scale-95">
+                    Live Catalog <i class="fas fa-arrow-right ml-4 text-xs group-hover:translate-x-2 transition-transform opacity-30"></i>
+                </a>
             </div>
-            <div class="relative hidden lg:block">
-                <div class="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-white/20 rounded-2xl p-5 text-white text-center"><i class="fas fa-sun text-4xl text-yellow-300 mb-2 block"></i><p class="font-semibold">Solar Panels</p><p class="text-sm text-orange-100">High Efficiency</p></div>
-                        <div class="bg-white/20 rounded-2xl p-5 text-white text-center"><i class="fas fa-bolt text-4xl text-yellow-300 mb-2 block"></i><p class="font-semibold">Inverters</p><p class="text-sm text-orange-100">Smart & Reliable</p></div>
-                        <div class="bg-white/20 rounded-2xl p-5 text-white text-center"><i class="fas fa-battery-full text-4xl text-yellow-300 mb-2 block"></i><p class="font-semibold">Batteries</p><p class="text-sm text-orange-100">24/7 Backup</p></div>
-                        <div class="bg-white/20 rounded-2xl p-5 text-white text-center"><i class="fas fa-tools text-4xl text-yellow-300 mb-2 block"></i><p class="font-semibold">Installation</p><p class="text-sm text-orange-100">Expert Team</p></div>
-                    </div>
+
+            <!-- Stats Bar -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-20 pt-10 border-t border-white/10">
+                <div>
+                    <h3 class="text-3xl font-bold text-amber-500 mb-1">5,000+</h3>
+                    <p class="text-gray-500 text-sm font-medium">Installations</p>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold text-amber-500 mb-1">98%</h3>
+                    <p class="text-gray-500 text-sm font-medium">Client Satisfaction</p>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold text-amber-500 mb-1">25yr</h3>
+                    <p class="text-gray-500 text-sm font-medium">Panel Warranty</p>
                 </div>
             </div>
         </div>
+    </div>
+    
+    <!-- Decorative solar panel grid overlay -->
+    <div class="absolute right-0 bottom-0 top-0 w-1/3 opacity-20 hidden lg:block pointer-events-none">
+        <div class="h-full w-full" style="background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0); background-size: 40px 40px;"></div>
     </div>
 </section>
 
-<!-- Product Categories -->
-<section class="py-20 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4">
-        <div class="text-center mb-14">
-            <span class="text-orange-500 font-semibold text-sm uppercase tracking-wider">What We Offer</span>
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mt-2">Browse by Category</h2>
-            <p class="text-gray-500 mt-3 max-w-xl mx-auto">Explore our complete range of solar products organized by category</p>
+<!-- Why Choose Us -->
+<section class="py-32 bg-[#0f172a] relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+        <div class="text-center mb-20 fade-up">
+            <span class="text-amber-500 font-black text-xs uppercase tracking-[0.3em] block mb-4">Why Choose Us</span>
+            <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight">The {{ explode(' ', $settings['company_name'] ?? 'SolarVolt Solutions')[0] }} Advantage</h2>
         </div>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
-            @foreach($categories as $cat)
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             @php
-                $colorMap = ['yellow'=>['bg'=>'bg-yellow-50','icon'=>'text-yellow-500','border'=>'border-yellow-200','hover'=>'hover:bg-yellow-100'],'blue'=>['bg'=>'bg-blue-50','icon'=>'text-blue-500','border'=>'border-blue-200','hover'=>'hover:bg-blue-100'],'green'=>['bg'=>'bg-green-50','icon'=>'text-green-500','border'=>'border-green-200','hover'=>'hover:bg-green-100'],'red'=>['bg'=>'bg-red-50','icon'=>'text-red-500','border'=>'border-red-200','hover'=>'hover:bg-red-100'],'gray'=>['bg'=>'bg-gray-50','icon'=>'text-gray-500','border'=>'border-gray-200','hover'=>'hover:bg-gray-100'],'purple'=>['bg'=>'bg-purple-50','icon'=>'text-purple-500','border'=>'border-purple-200','hover'=>'hover:bg-purple-100'],'orange'=>['bg'=>'bg-orange-50','icon'=>'text-orange-500','border'=>'border-orange-200','hover'=>'hover:bg-orange-100']];
-                $c = $colorMap[$cat->color] ?? $colorMap['orange'];
+                $advantages = [
+                    ['icon' => 'fas fa-dollar-sign', 'title' => 'Save Up to 70%', 'desc' => 'Drastically reduce your electricity bills with our high-efficiency solar panels.'],
+                    ['icon' => 'fas fa-leaf', 'title' => 'Eco-Friendly', 'desc' => 'Reduce your carbon footprint and contribute to a cleaner, greener planet.'],
+                    ['icon' => 'fas fa-shield-alt', 'title' => '25-Year Warranty', 'desc' => 'Industry-leading warranty coverage for complete peace of mind.'],
+                    ['icon' => 'fas fa-tools', 'title' => 'Expert Installation', 'desc' => 'Certified technicians handle everything from design to installation.'],
+                    ['icon' => 'fas fa-clock', 'title' => 'Quick Turnaround', 'desc' => 'From consultation to installation in as little as 2 weeks.'],
+                    ['icon' => 'fas fa-trophy', 'title' => 'Premium Quality', 'desc' => 'Tier-1 solar panels with the highest efficiency ratings available.'],
+                ];
             @endphp
-            <a href="{{ route('products.category', $cat->slug) }}" class="card-hover {{ $c['bg'] }} border {{ $c['border'] }} {{ $c['hover'] }} rounded-2xl p-5 text-center transition-all">
-                <div class="w-14 h-14 mx-auto mb-3 flex items-center justify-center">
-                    <i class="{{ $cat->icon ?? 'fas fa-solar-panel' }} text-3xl {{ $c['icon'] }}"></i>
-                </div>
-                <p class="font-semibold text-gray-800 text-sm">{{ $cat->name }}</p>
-                <p class="text-gray-400 text-xs mt-1">{{ $cat->products_count }} products</p>
-            </a>
-            @endforeach
-        </div>
-        <div class="text-center mt-8">
-            <a href="{{ route('products') }}" class="inline-flex items-center text-orange-600 font-semibold hover:text-orange-700">View All Products <i class="fas fa-arrow-right ml-2"></i></a>
-        </div>
-    </div>
-</section>
 
-<!-- Featured Packages -->
-<section class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4">
-        <div class="text-center mb-14">
-            <span class="text-orange-500 font-semibold text-sm uppercase tracking-wider">Ready to Install</span>
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mt-2">Popular Solar Packages</h2>
-            <p class="text-gray-500 mt-3 max-w-xl mx-auto">Complete solar packages designed for different needs and budgets</p>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            @foreach($packages as $i => $pkg)
-            <div class="card-hover bg-white border-2 {{ $i === 1 ? 'border-orange-500 relative' : 'border-gray-200' }} rounded-2xl p-8">
-                @if($i === 1)<span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-500 text-white px-4 py-1 rounded-full text-xs font-bold">⭐ Most Popular</span>@endif
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold text-gray-800">{{ $pkg->name }}</h3>
-                    <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium">{{ $pkg->system_size_kw }}kW</span>
+            @foreach($advantages as $adv)
+            <div class="glass p-12 rounded-[40px] border border-white/5 card-hover group relative">
+                <div class="absolute -top-6 -right-6 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl group-hover:bg-amber-500/10 transition-colors"></div>
+                
+                <div class="w-20 h-20 bg-amber-500/10 rounded-3xl flex items-center justify-center mb-10 border border-amber-500/20 group-hover:bg-amber-500 group-hover:scale-110 transition-all duration-500 shadow-xl group-hover:shadow-amber-500/20">
+                    <i class="{{ $adv['icon'] }} text-amber-500 text-3xl group-hover:text-white transition-colors"></i>
                 </div>
-                <div class="text-3xl font-bold text-orange-600 mb-1">₹{{ number_format($pkg->price) }}</div>
-                <p class="text-gray-500 text-sm mb-5">{{ $pkg->description }}</p>
-                @if($pkg->includes)
-                <ul class="space-y-2 mb-6">
-                    @foreach(explode(',', $pkg->includes) as $inc)
-                    <li class="flex items-center text-sm text-gray-600"><i class="fas fa-check text-green-500 mr-2 flex-shrink-0"></i>{{ trim($inc) }}</li>
-                    @endforeach
-                </ul>
-                @endif
-                <a href="{{ route('get.quote') }}?package={{ $pkg->id }}" class="block text-center {{ $i === 1 ? 'bg-orange-500 text-white' : 'border-2 border-orange-500 text-orange-600' }} py-3 rounded-xl font-semibold hover:bg-orange-500 hover:text-white transition-all">Get This Package</a>
+                <h3 class="text-3xl font-black text-white mb-6 tracking-tighter">{{ $adv['title'] }}</h3>
+                <p class="text-gray-400 leading-relaxed font-inter font-medium">
+                    {{ $adv['desc'] }}
+                </p>
             </div>
             @endforeach
         </div>
-        <div class="text-center mt-8">
-            <a href="{{ route('packages') }}" class="inline-flex items-center text-orange-600 font-semibold hover:text-orange-700">View All Packages <i class="fas fa-arrow-right ml-2"></i></a>
+    </div>
+</section>
+
+<!-- Energy Solutions -->
+<section class="py-32 bg-[#111a2e]">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-20 fade-up">
+            <span class="text-amber-500 font-black text-xs uppercase tracking-[0.3em] block mb-4">Energy Solutions</span>
+            <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight">Tailored for your specific needs</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            @php
+                $solutions = [
+                    ['img' => 'product-residential.jpg', 'title' => 'Residential Solar', 'desc' => 'Power your home with clean energy and eliminate your electricity bills forever.'],
+                    ['img' => 'product-commercial.jpg', 'title' => 'Commercial Solar', 'desc' => 'High-capacity solar systems for businesses, industries, and large-scale buildings.'],
+                    ['img' => 'product-portable.jpg', 'title' => 'Portable & Backup', 'desc' => 'Advanced battery storage and portable solar solutions for off-grid power anywhere.'],
+                ];
+            @endphp
+
+            @foreach($solutions as $sol)
+            <div class="group relative h-[450px] rounded-[40px] overflow-hidden border border-white/5 card-hover shadow-2xl">
+                <!-- Image with Zoom on Hover -->
+                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('{{ asset('storage/'.$sol['img']) }}')"></div>
+                
+                <!-- Dark Overlay Gradient -->
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/40 to-transparent"></div>
+                
+                <!-- Content -->
+                <div class="absolute inset-0 p-10 flex flex-col justify-end">
+                    <h3 class="text-3xl font-black text-white mb-4 tracking-tight group-hover:text-amber-500 transition-colors">{{ $sol['title'] }}</h3>
+                    <p class="text-gray-300 font-inter leading-relaxed text-sm mb-6 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                        {{ $sol['desc'] }}
+                    </p>
+                    <a href="{{ route('get.quote') }}" class="inline-flex items-center gap-2 text-amber-500 font-black uppercase text-xs tracking-widest group-hover:gap-4 transition-all">
+                        Learn More <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            @endforeach
         </div>
     </div>
 </section>
 
-<!-- Why Us -->
-<section class="py-20 bg-gradient-to-br from-orange-50 to-amber-50">
+<!-- Featured Products Section -->
+<section class="py-32 bg-[#111a2e] border-y border-white/5">
     <div class="max-w-7xl mx-auto px-4">
-        <div class="text-center mb-14">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Why Choose SolarTech?</h2>
-            <p class="text-gray-500 mt-3">We are committed to quality, reliability and customer satisfaction</p>
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div class="fade-up">
+                <span class="text-amber-500 font-black text-xs uppercase tracking-[0.3em] block mb-4">Our Catalog</span>
+                <h2 class="text-4xl font-bold text-white tracking-tight">Premium Solar Hardware</h2>
+            </div>
+            <a href="{{ route('products') }}" class="text-amber-500 font-bold hover:text-amber-400 transition-colors flex items-center gap-2">
+                View All Products <i class="fas fa-arrow-right text-xs"></i>
+            </a>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            @foreach([['fas fa-award','orange','Premium Quality','Top-tier solar products from globally certified manufacturers.'],['fas fa-user-cog','blue','Expert Installation','Our trained technicians ensure safe and efficient installation.'],['fas fa-headset','green','24/7 Support','Round-the-clock customer support and AMC services.'],['fas fa-rupee-sign','purple','Best Price','Competitive pricing with easy EMI options available.']] as $f)
-            <div class="text-center">
-                <div class="w-16 h-16 bg-{{ $f[1] }}-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <i class="{{ $f[0] }} text-{{ $f[1] }}-500 text-2xl"></i>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            @foreach($products as $product)
+            <div class="glass rounded-3xl overflow-hidden border border-white/5 card-hover flex flex-col h-full">
+                <div class="aspect-square bg-[#0f172a] p-8 flex items-center justify-center relative overflow-hidden">
+                    @if($product->image)
+                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="max-h-full max-w-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500">
+                    @else
+                        <i class="fas fa-solar-panel text-6xl text-white/5"></i>
+                    @endif
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] to-transparent opacity-60"></div>
                 </div>
-                <h3 class="font-bold text-gray-800 mb-2">{{ $f[2] }}</h3>
-                <p class="text-gray-500 text-sm">{{ $f[3] }}</p>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <span class="text-amber-500/80 text-[10px] uppercase font-black tracking-widest block mb-2">{{ $product->productCategory->name ?? 'Product' }}</span>
+                            <h3 class="text-lg font-black text-white hover:text-amber-500 transition-colors tracking-tight">{{ $product->name }}</h3>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between pt-6 border-t border-white/5">
+                            <span class="text-white font-black">₹{{ number_format($product->selling_price) }}</span>
+                            <a href="{{ route('products') }}" class="w-10 h-10 bg-white/5 hover:bg-amber-500 rounded-xl flex items-center justify-center transition-all">
+                                <i class="fas fa-arrow-right text-[10px] text-white"></i>
+                            </a>
+                        </div>
+                    </div>
             </div>
             @endforeach
         </div>
@@ -124,14 +170,25 @@
 </section>
 
 <!-- CTA -->
-<section class="py-16 hero-bg text-white text-center">
-    <div class="max-w-3xl mx-auto px-4">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">Ready to Go Solar?</h2>
-        <p class="text-xl text-orange-100 mb-8">Get a free consultation and customized quote within 24 hours.</p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="{{ route('get.quote') }}" class="bg-white text-orange-600 px-8 py-4 rounded-full font-bold hover:shadow-xl transition-all"><i class="fas fa-calculator mr-2"></i>Get Free Quote</a>
-            <a href="{{ route('contact') }}" class="border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-orange-600 transition-all"><i class="fas fa-phone mr-2"></i>Call Us Now</a>
+<section class="py-24 relative overflow-hidden">
+    <div class="absolute inset-0 bg-amber-500"></div>
+    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 20px 20px;"></div>
+    <div class="max-w-7xl mx-auto px-4 relative z-10 text-center">
+        <h2 class="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter">
+            Ready to switch to clean energy?
+        </h2>
+        <p class="text-white/80 text-xl font-medium mb-12 max-w-2xl mx-auto">
+            Join thousands of happy homeowners and businesses who saved millions on electricity bills.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-6 justify-center">
+            <a href="{{ route('get.quote') }}" class="bg-white text-amber-600 px-12 py-5 rounded-2xl font-black text-xl hover:shadow-2xl transition-all hover:-translate-y-1">
+                Start Saving Today
+            </a>
+            <a href="{{ route('contact') }}" class="bg-[#0f172a] text-white px-12 py-5 rounded-2xl font-black text-xl hover:shadow-2xl transition-all hover:-translate-y-1">
+                Contact Expert
+            </a>
         </div>
     </div>
 </section>
 @endsection
+

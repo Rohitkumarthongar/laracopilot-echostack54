@@ -67,9 +67,14 @@
                                     class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1.5">Assigned Team</label>
-                                <input type="text" name="assigned_team" value="{{ old('assigned_team', $installation->assigned_team) }}"
-                                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                                <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-widest italic">Assigned Crew</label>
+                                <select name="assigned_team"
+                                    class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 font-bold bg-indigo-50/50">
+                                    <option value="">— Unassigned —</option>
+                                    @foreach($teams as $team)
+                                        <option value="{{ $team->name }}" {{ old('assigned_team', $installation->assigned_team) == $team->name ? 'selected' : '' }}>{{ $team->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
 

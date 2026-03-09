@@ -25,11 +25,7 @@
         </div>
     </div>
 
-    @if(session('success'))
-    <div class="bg-green-50 border border-green-200 text-green-700 rounded-xl px-5 py-3 flex items-center gap-3">
-        <i class="fas fa-check-circle text-green-500"></i> {{ session('success') }}
-    </div>
-    @endif
+    {{-- Success alerts are now handled globally via SweetAlert --}}
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse($roles as $role)
@@ -70,7 +66,7 @@
                     
                     @if($role->name !== 'admin' && $role->users_count == 0)
                     <form action="{{ route('admin.roles.destroy', $role->id) }}" method="POST"
-                        onsubmit="return confirm('Delete role?');">
+                        class="delete-form" data-title="Delete Role?" data-text="Warning: Handlers or permissions tied to this role label will be disrupted.">
                         @csrf @method('DELETE')
                         <button type="submit" class="w-9 h-8 bg-white border border-red-50 text-red-100 hover:text-red-500 hover:bg-red-50 rounded-lg flex items-center justify-center transition">
                             <i class="fas fa-trash-alt text-[10px]"></i>

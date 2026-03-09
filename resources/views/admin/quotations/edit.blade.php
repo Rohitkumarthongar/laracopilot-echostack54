@@ -1,0 +1,340 @@
+@extends('layouts.admin')
+@section('title', 'Edit Quotation — ' . $quotation->quotation_number)
+@section('page-title', 'Edit Quotation')
+@section('content')
+<div class="space-y-6">
+
+    {{-- Header --}}
+    <div class="flex items-center gap-3">
+        <a href="{{ route('admin.quotations.show', $quotation->id) }}"
+            class="w-9 h-9 flex items-center justify-center rounded-xl bg-white shadow-sm border border-gray-200 text-gray-500 hover:text-indigo-600 transition">
+            <i class="fas fa-arrow-left text-sm"></i>
+        </a>
+        <div>
+            <h2 class="text-xl font-bold text-gray-800">Edit Quotation: {{ $quotation->quotation_number }}</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Update details and items for this quotation.</p>
+        </div>
+    </div>
+
+    {{-- Validation Errors --}}
+    @if($errors->any())
+    <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl px-5 py-4">
+        <p class="font-semibold mb-1 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i> Please fix the following errors:</p>
+        <ul class="list-disc list-inside text-sm space-y-0.5">
+            @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
+    <form action="{{ route('admin.quotations.update', $quotation->id) }}" method="POST" id="quotation-form">
+        @csrf
+        @method('PUT')
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+            {{-- ═══ LEFT COLUMN (Customer + Items) ═══ --}}
+            <div class="xl:col-span-2 space-y-6">
+
+                {{-- Customer Details --}}
+                <div class="bg-white rounded-2xl shadow-sm p-6 space-y-4">
+                    <h3 class="font-bold text-gray-700 text-base border-b border-gray-100 pb-3 flex items-center gap-2">
+                        <i class="fas fa-user text-indigo-400"></i> Customer Details
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Full Name <span class="text-red-500">*</span></label>
+                            <input type="text" name="customer_name" value="{{ old('customer_name', $quotation->customer_name) }}" id="field_name"
+                                class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 @error('customer_name') border-red-400 @enderror"
+                                placeholder="Customer full name" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Email <span class="text-red-500">*</span></label>
+                            <input type="email" name="customer_email" value="{{ old('customer_email', $quotation->customer_email) }}" id="field_email"
+                                class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 @error('customer_email') border-red-400 @enderror"
+                                placeholder="customer@email.com" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Phone <span class="text-red-500">*</span></label>
+                            <input type="text" name="customer_phone" value="{{ old('customer_phone', $quotation->customer_phone) }}" id="field_phone"
+                                class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 @error('customer_phone') border-red-400 @enderror"
+                                placeholder="+91 XXXXX XXXXX" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Valid Until <span class="text-red-500">*</span></label>
+                            <input type="date" name="valid_until" value="{{ old('valid_until', \Carbon\Carbon::parse($quotation->valid_until)->format('Y-m-d')) }}"
+                                class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 @error('valid_until') border-red-400 @enderror"
+                                required>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Address <span class="text-red-500">*</span></label>
+                            <textarea name="customer_address" id="field_address" rows="2"
+                                class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 @error('customer_address') border-red-400 @enderror"
+                                placeholder="Full address" required>{{ old('customer_address', $quotation->customer_address) }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Status & Meta --}}
+                <div class="bg-white rounded-2xl shadow-sm p-6 space-y-4">
+                    <h3 class="font-bold text-gray-700 text-base border-b border-gray-100 pb-3 flex items-center gap-2">
+                        <i class="fas fa-info-circle text-indigo-400"></i> Quotation Status
+                    </h3>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Quotation Status <span class="text-red-500">*</span></label>
+                        <select name="status" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                            <option value="pending" {{ old('status', $quotation->status) == 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="sent" {{ old('status', $quotation->status) == 'sent' ? 'selected' : '' }}>Sent</option>
+                            <option value="approved" {{ old('status', $quotation->status) == 'approved' ? 'selected' : '' }}>Approved</option>
+                            <option value="rejected" {{ old('status', $quotation->status) == 'rejected' ? 'selected' : '' }}>Rejected</option>
+                            <option value="expired" {{ old('status', $quotation->status) == 'expired' ? 'selected' : '' }}>Expired</option>
+                        </select>
+                    </div>
+                </div>
+
+                {{-- Line Items --}}
+                <div class="bg-white rounded-2xl shadow-sm p-6 space-y-4 shadow-sm">
+                    <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                        <h3 class="font-bold text-gray-700 text-base flex items-center gap-2">
+                            <i class="fas fa-list text-indigo-400"></i> Line Items
+                        </h3>
+                        <button type="button" onclick="addEmptyItem()"
+                            class="inline-flex items-center gap-1.5 text-xs font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg transition">
+                            <i class="fas fa-plus"></i> Add Row
+                        </button>
+                    </div>
+
+                    {{-- Items Table --}}
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm" id="items-table">
+                            <thead>
+                                <tr class="border-b border-gray-100">
+                                    <th class="text-left py-2 text-gray-500 font-medium w-full">Description</th>
+                                    <th class="text-right py-2 text-gray-500 font-medium min-w-[80px] px-2">Product</th>
+                                    <th class="text-right py-2 text-gray-500 font-medium min-w-[80px] px-2">Qty</th>
+                                    <th class="text-right py-2 text-gray-500 font-medium min-w-[110px] px-2">Unit Price (₹)</th>
+                                    <th class="text-right py-2 text-gray-500 font-medium min-w-[110px] px-2">Total (₹)</th>
+                                    <th class="py-2 px-2 w-8"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="items-body">
+                                {{-- JS will populate existing items --}}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p class="text-xs text-gray-400 flex items-center gap-1">
+                        <i class="fas fa-info-circle"></i>
+                        At least one item is required. Totals update automatically.
+                    </p>
+                </div>
+
+                {{-- Notes --}}
+                <div class="bg-white rounded-2xl shadow-sm p-6 shadow-sm">
+                    <h3 class="font-bold text-gray-700 text-base border-b border-gray-100 pb-3 mb-4 flex items-center gap-2">
+                        <i class="fas fa-sticky-note text-indigo-400"></i> Notes
+                    </h3>
+                    <textarea name="notes" rows="3"
+                        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                        placeholder="Any additional terms, conditions, or notes for this quotation…">{{ old('notes', $quotation->notes) }}</textarea>
+                </div>
+
+            </div>
+
+            {{-- ═══ RIGHT COLUMN (Totals + Submit) ═══ --}}
+            <div class="space-y-6">
+
+                {{-- Totals Card --}}
+                <div class="bg-white rounded-2xl shadow-sm p-6 space-y-4 sticky top-6 shadow-sm">
+                    <h3 class="font-bold text-gray-700 text-base border-b border-gray-100 pb-3 flex items-center gap-2">
+                        <i class="fas fa-calculator text-indigo-400"></i> Summary
+                    </h3>
+
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Subtotal</span>
+                            <span class="font-semibold text-gray-800" id="display-subtotal">₹0</span>
+                        </div>
+
+                        {{-- Tax --}}
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1.5">Tax Amount (₹)</label>
+                            <input type="number" name="tax_amount" id="tax_amount" value="{{ old('tax_amount', $quotation->tax_amount) }}"
+                                min="0" step="0.01"
+                                class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                                oninput="recalcTotal()">
+                        </div>
+
+                        {{-- Discount --}}
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1.5">Discount Amount (₹)</label>
+                            <input type="number" name="discount_amount" id="discount_amount" value="{{ old('discount_amount', $quotation->discount_amount) }}"
+                                min="0" step="0.01"
+                                class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                                oninput="recalcTotal()">
+                        </div>
+
+                        <div class="border-t border-gray-100 pt-3 flex justify-between">
+                            <span class="font-bold text-gray-700">Grand Total</span>
+                            <span class="font-bold text-indigo-600 text-lg" id="display-total">₹0</span>
+                        </div>
+                    </div>
+
+                    {{-- Submit --}}
+                    <div class="space-y-2 pt-2">
+                        <button type="submit"
+                            class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <a href="{{ route('admin.quotations.show', $quotation->id) }}"
+                            class="block text-center text-sm text-gray-500 hover:text-gray-700 py-2 transition">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Products Reference --}}
+                @if($products->count())
+                <div class="bg-white rounded-2xl shadow-sm p-6 shadow-sm">
+                    <h3 class="font-bold text-gray-700 text-base border-b border-gray-100 pb-3 mb-3 flex items-center gap-2">
+                        <i class="fas fa-box-open text-indigo-400"></i> Products
+                    </h3>
+                    <p class="text-xs text-gray-400 mb-3">Click a product to add it as a line item.</p>
+                    <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                        @foreach($products as $product)
+                        <button type="button"
+                            onclick="addItem('{{ addslashes($product->name) }} ({{ $product->sku ?? $product->brand }})', 1, {{ $product->selling_price }}, {{ $product->id }})"
+                            class="w-full text-left px-3 py-2.5 rounded-xl border border-gray-100 hover:border-indigo-300 hover:bg-indigo-50 transition group">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs font-semibold text-gray-700 group-hover:text-indigo-700">{{ $product->name }}</p>
+                                    <p class="text-xs text-gray-400">{{ $product->brand ?? $product->category }}</p>
+                                </div>
+                                <p class="text-xs font-bold text-indigo-600">₹{{ number_format($product->selling_price, 0) }}</p>
+                            </div>
+                        </button>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Products data for item rows
+    const products = {!! json_encode($products->map(fn($p) => ['id' => $p->id, 'name' => $p->name, 'price' => (float)$p->selling_price])->values()->all()) !!};
+    const existingItems = {!! json_encode($quotation->items->map(fn($i) => ['description' => $i->description, 'quantity' => $i->quantity, 'unit_price' => $i->unit_price, 'product_id' => $i->product_id])->values()->all()) !!};
+
+    let itemIndex = 0;
+
+    function productOptions(selectedId = '') {
+        let opts = '<option value="">— None —</option>';
+        products.forEach(p => {
+            opts += `<option value="${p.id}" data-price="${p.price}" ${selectedId == p.id ? 'selected' : ''}>${p.name}</option>`;
+        });
+        return opts;
+    }
+
+    function addItem(description = '', quantity = 1, unitPrice = 0, productId = '') {
+        const tbody = document.getElementById('items-body');
+        const idx = itemIndex++;
+        const row = document.createElement('tr');
+        row.className = 'border-b border-gray-50 align-top';
+        row.id = `item-row-${idx}`;
+        row.innerHTML = `
+            <td class="py-2 pr-2">
+                <input type="text" name="items[${idx}][description]"
+                    value="${description}"
+                    class="w-full border border-gray-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                    placeholder="Item description" required>
+            </td>
+            <td class="py-2 px-2">
+                <select name="items[${idx}][product_id]"
+                    onchange="onProductChange(this, ${idx})"
+                    class="w-full border border-gray-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 min-w-[130px]">
+                    ${productOptions(productId)}
+                </select>
+            </td>
+            <td class="py-2 px-2">
+                <input type="number" name="items[${idx}][quantity]" id="qty-${idx}"
+                    value="${quantity}" min="1" step="0.01"
+                    class="w-full border border-gray-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 text-right min-w-[70px]"
+                    oninput="calcRow(${idx})" required>
+            </td>
+            <td class="py-2 px-2">
+                <input type="number" name="items[${idx}][unit_price]" id="price-${idx}"
+                    value="${unitPrice}" min="0" step="0.01"
+                    class="w-full border border-gray-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 text-right min-w-[100px]"
+                    oninput="calcRow(${idx})" required>
+            </td>
+            <td class="py-2 px-2 text-right">
+                <span id="row-total-${idx}" class="font-semibold text-gray-700 text-sm">₹${formatNum(quantity * unitPrice)}</span>
+            </td>
+            <td class="py-2 pl-2">
+                <button type="button" onclick="removeItem(${idx})"
+                    class="w-7 h-7 flex items-center justify-center rounded-lg bg-red-50 hover:bg-red-100 text-red-400 hover:text-red-600 transition">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </td>`;
+        tbody.appendChild(row);
+        recalcTotal();
+    }
+    
+    function addEmptyItem() {
+        addItem('', 1, 0, '');
+    }
+
+    function removeItem(idx) {
+        const row = document.getElementById(`item-row-${idx}`);
+        if (row) { row.remove(); recalcTotal(); }
+    }
+
+    function onProductChange(sel, idx) {
+        const opt = sel.options[sel.selectedIndex];
+        const price = opt.getAttribute('data-price');
+        if (price) {
+            document.getElementById(`price-${idx}`).value = parseFloat(price).toFixed(2);
+            calcRow(idx);
+        }
+    }
+
+    function calcRow(idx) {
+        const qty   = parseFloat(document.getElementById(`qty-${idx}`)?.value)   || 0;
+        const price = parseFloat(document.getElementById(`price-${idx}`)?.value) || 0;
+        const el = document.getElementById(`row-total-${idx}`);
+        if (el) el.textContent = '₹' + formatNum(qty * price);
+        recalcTotal();
+    }
+
+    function recalcTotal() {
+        let sub = 0;
+        document.querySelectorAll('[id^="row-total-"]').forEach(el => {
+            sub += parseFloat(el.textContent.replace(/[₹,]/g, '')) || 0;
+        });
+        const tax      = parseFloat(document.getElementById('tax_amount')?.value)      || 0;
+        const discount = parseFloat(document.getElementById('discount_amount')?.value) || 0;
+        document.getElementById('display-subtotal').textContent = '₹' + formatNum(sub);
+        document.getElementById('display-total').textContent    = '₹' + formatNum(sub + tax - discount);
+    }
+
+    function formatNum(n) {
+        return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(n);
+    }
+
+    // Load existing items
+    if (existingItems && existingItems.length > 0) {
+        existingItems.forEach(item => {
+            addItem(item.description, item.quantity, item.unit_price, item.product_id);
+        });
+    } else {
+        addEmptyItem();
+    }
+
+    // Run initial calc
+    recalcTotal();
+</script>
+@endsection
