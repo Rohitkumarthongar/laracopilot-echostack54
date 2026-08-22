@@ -1,6 +1,7 @@
 const CACHE_NAME = 'solar-erp-v4';
 const STATIC_ASSETS = [
     '/',
+    '/?source=pwa',
     '/manifest.json',
     '/offline.html',
     'https://cdn.tailwindcss.com',
